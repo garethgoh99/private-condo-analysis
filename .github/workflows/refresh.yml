@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths-ignore: ["README.md", "docs/**", "reference/**"]
+    paths-ignore: ["README.md", "docs/**", "reference/**", "skills/**"]
 
 permissions:
   contents: write

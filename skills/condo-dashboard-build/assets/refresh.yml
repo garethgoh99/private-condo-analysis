@@ -1,0 +1,104 @@
+name: Refresh data and dashboard
+
+# Daily: pull all four URA services -> merge into the permanent archive on the
+# `raw-data` branch -> geocode any new projects -> (once built) rebuild + deploy the dashboard.
+on:
+  schedule:
+    - cron: "37 18 * * *"   # 02:37 Singapore time
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: ["README.md", "docs/**", "reference/**", "skills/**"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      built: ${{ steps.built.outputs.built }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check out the data store (raw-data branch) into store/
+        run: |
+          git fetch --depth 1 origin raw-data
+          git worktree add store FETCH_HEAD
+          cd store && git checkout -B raw-data
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Fetch from URA
+        env:
+          URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
+        run: python pipeline/fetch.py 2>&1 | tee /tmp/fetch.log; s=${PIPESTATUS[0]}; [ $s -eq 0 ] || echo "::error title=fetch failed::$(tail -3 /tmp/fetch.log | tr '\\n' ' ')"; exit $s
+
+      - name: Merge into permanent archive
+        run: |
+          python pipeline/archive.py store
+          rm -rf store/latest && mkdir -p store/latest
+          for f in data/raw/*.json; do gzip -9c "$f" > "store/latest/$(basename "$f").gz"; done
+          cp data/raw/manifest.json store/latest/manifest.json
+
+      - name: Geocode projects URA publishes without coordinates
+        run: python pipeline/geocode.py store
+
+      - name: Commit store (archive keeps history; each commit is also a raw snapshot)
+        run: |
+          cd store
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Store unchanged."; exit 0; fi
+          git commit -q -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+          if ! out=$(git push origin HEAD:raw-data 2>&1); then
+            echo "::error title=push failed::$(echo "$out" | tail -5 | tr '\n' ' ')"; exit 1
+          fi
+          echo "$out"
+
+      - name: Build dashboard
+        if: hashFiles('pipeline/build.py') != ''
+        run: python pipeline/build.py store site
+
+      - name: Validate page JavaScript
+        if: hashFiles('pipeline/build.py') != ''
+        run: |
+          python - <<'PY'
+          import re
+          h = open("site/index.html").read()
+          left = re.findall(r"__[A-Z][A-Z_]+__", h)
+          assert not left, f"unfilled placeholders: {set(left)}"
+          open("/tmp/page.js", "w").write("\n".join(re.findall(r"<script>(.*?)</script>", h, re.S)))
+          PY
+          node --check /tmp/page.js
+
+      - uses: actions/upload-pages-artifact@v4
+        if: hashFiles('pipeline/build.py') != ''
+        with:
+          path: site
+
+      - id: built
+        run: echo "built=${{ hashFiles('pipeline/build.py') != '' }}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: refresh
+    if: needs.refresh.outputs.built == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
