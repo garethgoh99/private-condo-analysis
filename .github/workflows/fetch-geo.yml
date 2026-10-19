@@ -1,0 +1,31 @@
+name: Fetch boundary data (one-off)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["tools/fetch_geo.py", ".github/workflows/fetch-geo.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: fetch-raw
+  cancel-in-progress: false
+jobs:
+  geo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install requests
+      - run: python tools/fetch_geo.py
+      - name: Commit to raw-data/geo
+        run: |
+          set -e
+          cp -r data/geo /tmp/geo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch --depth 1 origin raw-data && git checkout -B raw-data FETCH_HEAD
+          git clean -fdxq; rm -rf geo; cp -r /tmp/geo geo
+          git add -A geo
+          git diff --cached --quiet || { git commit -q -m "Boundary GeoJSON from data.gov.sg"; git push origin raw-data; }
