@@ -42,11 +42,24 @@ def postal_district(postal):
     return SECTOR_TO_DISTRICT.get(postal[:2]) if len(postal) == 6 and postal.isdigit() else None
 
 
+STATS = {"calls": 0, "errors": 0, "last_error": ""}
+
+
 def search(session, q):
-    r = session.get(SEARCH, params={"searchVal": q, "returnGeom": "Y", "getAddrDetails": "Y", "pageNum": 1},
-                    timeout=30)
-    r.raise_for_status()
-    return r.json().get("results", []) or []
+    """Returns results list, or None if the request itself failed (so it is NOT cached as a miss)."""
+    for attempt in range(4):
+        STATS["calls"] += 1
+        try:
+            r = session.get(SEARCH, params={"searchVal": q, "returnGeom": "Y", "getAddrDetails": "Y",
+                                            "pageNum": 1}, timeout=30)
+            if r.status_code == 200:
+                return r.json().get("results", []) or []
+            STATS["last_error"] = f"HTTP {r.status_code}: {r.text[:120]}"
+        except Exception as e:  # noqa: BLE001
+            STATS["last_error"] = repr(e)[:160]
+        STATS["errors"] += 1
+        time.sleep(3 * (attempt + 1))
+    return None
 
 
 def pick(results, district):
@@ -90,25 +103,31 @@ def main(store):
             continue
         generic = r.project in GENERIC
         queries = ([] if generic else [r.project, f"{r.project} {r.street}"]) + [r.street]
-        res = None
+        res, errored = None, False
         for q in queries:
-            try:
-                hit = pick(search(s, q), r.district)
-            except Exception as e:  # noqa: BLE001
-                print(f"  search failed for {q!r}: {e}")
-                hit = None
-            time.sleep(0.25)
+            results = search(s, q)
+            time.sleep(0.4)  # OneMap allows ~250 calls/min
+            if results is None:
+                errored = True
+                continue
+            hit = pick(results, r.district)
             if hit:
                 res = {**hit, "query": q, "level": "street" if q == r.street else "project"}
                 break
         looked += 1
-        cache[key] = {**(res or {"x": None}), "district": r.district, "checked": today.isoformat()}
         if res:
             found += 1
+            cache[key] = {**res, "district": r.district, "checked": today.isoformat()}
+        elif not errored:
+            cache[key] = {"x": None, "district": r.district, "checked": today.isoformat()}
+        else:
+            cache.pop(key, None)  # request errors: try again next run
     json.dump(cache, open(cpath, "w"), indent=0, sort_keys=True)
     ok = sum(1 for v in cache.values() if v.get("x") is not None)
-    print(f"geocode: {len(todo)} projects lack URA coordinates; looked up {looked} now, found {found}; "
-          f"cache has {ok}/{len(cache)} located")
+    msg = (f"geocode: {len(todo)} lack URA coordinates; looked up {looked}, found {found}; cache {ok}/{len(cache)} "
+           f"located; {STATS['calls']} calls, {STATS['errors']} errors; last error: {STATS['last_error']}")
+    print(msg)
+    print(f"::notice title=geocode::{msg}")
 
 
 if __name__ == "__main__":
