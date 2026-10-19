@@ -1,0 +1,55 @@
+name: Fetch raw URA data
+
+# Pulls all four URA services and commits them (gzipped) to the `raw-data` branch.
+# Each commit on that branch is a dated snapshot, so history beyond URA's rolling
+# 5-year / 3-year windows is preserved in git.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "pipeline/fetch.py"
+      - ".github/workflows/fetch-raw.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-raw
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Fetch from URA
+        env:
+          URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
+        run: python pipeline/fetch.py
+      - name: Commit snapshot to raw-data branch
+        run: |
+          set -e
+          mkdir -p /tmp/snap && cp data/raw/*.json /tmp/snap/
+          gzip -9 /tmp/snap/*.json
+          cp /tmp/snap/manifest.json.gz /tmp/manifest.json.gz && gunzip -c /tmp/manifest.json.gz > /tmp/snap/manifest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin raw-data >/dev/null; then
+            git fetch --depth 1 origin raw-data
+            git checkout -B raw-data FETCH_HEAD
+          else
+            git checkout --orphan raw-data
+            git rm -rf --quiet . || true
+          fi
+          git clean -fdxq
+          rm -rf latest && mkdir latest && cp /tmp/snap/* latest/
+          git add -A latest
+          if git diff --cached --quiet; then echo "No change in data."; exit 0; fi
+          git commit -q -m "URA snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push origin raw-data
