@@ -23,6 +23,8 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    outputs:
+      built: ${{ steps.built.outputs.built }}
     steps:
       - uses: actions/checkout@v4
 
@@ -74,7 +76,8 @@ jobs:
           python - <<'PY'
           import re
           h = open("site/index.html").read()
-          assert "__" not in re.sub(r"__[a-z]+__", "", h).replace("__proto__", "") or True
+          left = re.findall(r"__[A-Z][A-Z_]+__", h)
+          assert not left, f"unfilled placeholders: {set(left)}"
           open("/tmp/page.js", "w").write("\n".join(re.findall(r"<script>(.*?)</script>", h, re.S)))
           PY
           node --check /tmp/page.js
@@ -84,9 +87,12 @@ jobs:
         with:
           path: site
 
+      - id: built
+        run: echo "built=${{ hashFiles('pipeline/build.py') != '' }}" >> "$GITHUB_OUTPUT"
+
   deploy:
     needs: refresh
-    if: hashFiles('pipeline/build.py') != ''
+    if: needs.refresh.outputs.built == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
