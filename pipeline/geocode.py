@@ -43,6 +43,11 @@ def postal_district(postal):
 
 
 STATS = {"calls": 0, "errors": 0, "last_error": ""}
+MAX_LOOKUPS_PER_RUN = 150  # spread the backlog over a few daily runs
+
+
+def r_is_429(stats):
+    return stats["last_error"].startswith("HTTP 429")
 
 
 def search(session, q):
@@ -58,7 +63,7 @@ def search(session, q):
         except Exception as e:  # noqa: BLE001
             STATS["last_error"] = repr(e)[:160]
         STATS["errors"] += 1
-        time.sleep(3 * (attempt + 1))
+        time.sleep(20 * (attempt + 1) if r_is_429(STATS) else 3 * (attempt + 1))
     return None
 
 
@@ -96,6 +101,8 @@ def main(store):
     todo = needed(store)
     looked = found = 0
     for r in todo.itertuples(index=False):
+        if looked >= MAX_LOOKUPS_PER_RUN or STATS["errors"] >= 12:
+            break  # leave the rest for the next daily run
         key = f"{r.project}|{r.street}"
         c = cache.get(key)
         if c and (c.get("x") is not None or
@@ -106,7 +113,7 @@ def main(store):
         res, errored = None, False
         for q in queries:
             results = search(s, q)
-            time.sleep(0.4)  # OneMap allows ~250 calls/min
+            time.sleep(1.0)  # OneMap rate-limits hard; stay well under it
             if results is None:
                 errored = True
                 continue

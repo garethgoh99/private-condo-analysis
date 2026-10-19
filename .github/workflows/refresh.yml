@@ -26,7 +26,7 @@ jobs:
     outputs:
       built: ${{ steps.built.outputs.built }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check out the data store (raw-data branch) into store/
         run: |
@@ -34,7 +34,7 @@ jobs:
           git worktree add store FETCH_HEAD
           cd store && git checkout -B raw-data
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -84,7 +84,7 @@ jobs:
           PY
           node --check /tmp/page.js
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         if: hashFiles('pipeline/build.py') != ''
         with:
           path: site

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Private Residential Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F3F1EA; --panel:#FFFFFF; --panel-2:#FAF9F4; --border:#DAD6C8;
+  --ink:#1B2420; --ink-soft:#5B6560; --ink-mute:#7C8580; --accent:#0E7C6B; --accent-2:#C97A2B;
+  --grid:#E4E0D2; --chip:#EEEBDF; --warn:#B0562E; --on-accent:#FFFFFF;
+  --seq-1:#DCEEEA; --seq-2:#9FD3C7; --seq-3:#4FA895; --seq-4:#0E7C6B; --seq-5:#054A3F;
+  --div-n3:#9C5A1C; --div-n2:#D9964F; --div-n1:#F2D9B8; --div-p1:#CFE8E1; --div-p2:#4FA895; --div-p3:#0B5E51;
+  --null:#E8E5DA; --land-edge:#FFFFFF;
+  --ccr:#7A2E2E; --rcr:#8A6A12;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#10161A; --panel:#171F24; --panel-2:#1C252B; --border:#2A363D;
+    --ink:#E7EEEC; --ink-soft:#9FB0AF; --ink-mute:#7F908F; --accent:#3FCBB0; --accent-2:#E8A94E;
+    --grid:#25313A; --chip:#20292F; --warn:#E8A94E; --on-accent:#08110F;
+    --seq-1:#1E3A36; --seq-2:#1F5F55; --seq-3:#2A8C7B; --seq-4:#3FBFA6; --seq-5:#8FE6D3;
+    --div-n3:#F0B26A; --div-n2:#B97A35; --div-n1:#7A5733; --div-p1:#2F6158; --div-p2:#2A8C7B; --div-p3:#7FDCC8;
+    --null:#222C31; --land-edge:#10161A;
+    --ccr:#F08A8A; --rcr:#E8C25A;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#10161A; --panel:#171F24; --panel-2:#1C252B; --border:#2A363D;
+  --ink:#E7EEEC; --ink-soft:#9FB0AF; --ink-mute:#7F908F; --accent:#3FCBB0; --accent-2:#E8A94E;
+  --grid:#25313A; --chip:#20292F; --warn:#E8A94E; --on-accent:#08110F;
+  --seq-1:#1E3A36; --seq-2:#1F5F55; --seq-3:#2A8C7B; --seq-4:#3FBFA6; --seq-5:#8FE6D3;
+  --div-n3:#F0B26A; --div-n2:#B97A35; --div-n1:#7A5733; --div-p1:#2F6158; --div-p2:#2A8C7B; --div-p3:#7FDCC8;
+  --null:#222C31; --land-edge:#10161A;
+  --ccr:#F08A8A; --rcr:#E8C25A;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+}
+*{box-sizing:border-box;}
+html{height:100%;}
+body{margin:0; min-height:100%; background:var(--bg); color:var(--ink); font-family:"Inter",-apple-system,sans-serif; font-feature-settings:"tnum" 1; font-size:13px;}
+h1,h2,h3,.disp{font-family:"Space Grotesk",sans-serif;}
+.wrap{max-width:1440px; margin:0 auto; padding:18px 20px 40px;}
+@media (max-width:600px){ .wrap{padding:12px 16px 32px;} }
+header.top{display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px 22px; margin-bottom:14px; border-bottom:1px solid var(--border); padding-bottom:14px;}
+header.top h1{font-size:22px; margin:0 0 4px; font-weight:700;}
+header.top .sub{color:var(--ink-soft); font-size:12.5px; max-width:560px; line-height:1.5;}
+.statbar{display:flex; gap:22px; margin-left:auto; flex-wrap:wrap; align-items:flex-end;}
+.stat{font-size:11.5px; color:var(--ink-soft);}
+.stat b{display:block; font-size:17px; color:var(--ink); font-family:"Space Grotesk",sans-serif; font-weight:600;}
+.themeBtn{font-size:11px; background:var(--chip); border:1px solid var(--border); color:var(--ink-soft); border-radius:5px; padding:5px 9px; cursor:pointer;}
+.panel{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:16px;}
+.panel h2{font-size:14px; margin:0 0 10px; font-weight:600; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:6px;}
+.hint{font-size:11px; color:var(--ink-soft); font-weight:400; font-family:"Inter",sans-serif;}
+/* filters */
+#filters{margin-bottom:16px;}
+.fhead{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+.fhead h2{margin:0;}
+.matchcount{font-size:12px; color:var(--ink-soft);}
+.matchcount b{color:var(--ink); font-family:"Space Grotesk",sans-serif; font-size:14px;}
+.fgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px 22px; margin-top:14px;}
+.fgrid.collapsed{display:none;}
+.fbox .lbl{font-size:11px; color:var(--ink-soft); display:flex; justify-content:space-between; gap:8px; margin-bottom:6px;}
+.fbox .lbl b{color:var(--ink); font-weight:600;}
+.pills{display:flex; flex-wrap:wrap; gap:5px;}
+.pill{border:1px solid var(--border); background:var(--chip); border-radius:20px; padding:4px 10px; font-size:11.5px; cursor:pointer; color:var(--ink-soft); user-select:none; line-height:1.3;}
+.pill:hover{border-color:var(--accent);}
+.pill.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
+.pill.ghost{background:none; border-style:dashed;}
+.pill:focus-visible,.themeBtn:focus-visible,button:focus-visible{outline:2px solid var(--accent-2); outline-offset:1px;}
+.rangewrap{position:relative; height:26px;}
+.rangewrap input[type=range]{position:absolute; width:100%; top:7px; margin:0; background:none; -webkit-appearance:none; appearance:none; pointer-events:none;}
+.rangewrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; pointer-events:auto; width:15px; height:15px; border-radius:50%; background:var(--accent); border:2px solid var(--panel); cursor:pointer; margin-top:-5.5px;}
+.rangewrap input[type=range]::-moz-range-thumb{pointer-events:auto; width:13px; height:13px; border-radius:50%; background:var(--accent); border:2px solid var(--panel); cursor:pointer;}
+.rangewrap input[type=range]::-webkit-slider-runnable-track{height:4px; background:var(--grid); border-radius:2px;}
+.rangewrap input[type=range]::-moz-range-track{height:4px; background:var(--grid); border-radius:2px;}
+.numpair{display:flex; gap:6px; align-items:center;}
+.numpair input{width:100%; min-width:0; font-size:12px; background:var(--chip); color:var(--ink); border:1px solid var(--border); border-radius:5px; padding:5px 7px; font-family:inherit;}
+.chk{font-size:11.5px; color:var(--ink-soft); display:flex; align-items:center; gap:6px; margin-top:4px; cursor:pointer;}
+select.sel{font-size:12px; background:var(--chip); color:var(--ink); border:1px solid var(--border); border-radius:5px; padding:5px 8px; font-family:inherit;}
+.btn{font-size:11.5px; color:var(--accent); background:none; border:1px solid var(--accent); border-radius:5px; padding:5px 11px; cursor:pointer; font-family:inherit;}
+.btn:hover{background:var(--chip);}
+/* layout */
+.grid{display:grid; grid-template-columns:1.15fr 1fr; gap:16px; align-items:start;}
+.grid > *{min-width:0;}
+@media (max-width:1060px){ .grid{grid-template-columns:1fr;} }
+.ctrlrow{display:flex; flex-wrap:wrap; gap:10px 18px; align-items:flex-end; margin-bottom:10px;}
+.ctrlrow .fbox{min-width:0;}
+.timebox{padding:12px 0 12px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:10px;}
+.presets{display:flex; gap:4px; flex-wrap:wrap;}
+/* map */
+.mapbox{position:relative;}
+svg#map{width:100%; height:auto; display:block; touch-action:manipulation;}
+.dist{vector-effect:non-scaling-stroke; stroke:var(--land-edge); stroke-width:1.2; cursor:pointer; transition:opacity .12s;}
+.dist:hover{opacity:.82;}
+.dist.sel{stroke:var(--ink); stroke-width:2.4;}
+.dist.null{fill:url(#hatch);}
+.dlab{font-family:"Space Grotesk",sans-serif; font-size:13px; font-weight:600; pointer-events:none; text-anchor:middle;}
+.dval{font-family:"Inter",sans-serif; font-size:10.5px; pointer-events:none; text-anchor:middle;}
+.seg-outline{vector-effect:non-scaling-stroke; fill:none; stroke-width:2.6; pointer-events:none; stroke-linejoin:round;}
+.seg-outline.CCR{stroke:var(--ccr);}
+.seg-outline.RCR{stroke:var(--rcr); stroke-dasharray:7 4;}
+.seglab{font-family:"Space Grotesk",sans-serif; font-size:12px; font-weight:700; pointer-events:none; text-anchor:middle; paint-order:stroke; stroke:var(--panel); stroke-width:3px;}
+.pdot{vector-effect:non-scaling-stroke; fill:var(--ink); fill-opacity:.62; stroke:var(--panel); stroke-width:.8; cursor:pointer;}
+.pdot:hover,.pdot.sel{fill:var(--accent-2); fill-opacity:1;}
+.zoomBtn{position:absolute; top:6px; right:6px; display:none;}
+.tip{position:absolute; pointer-events:none; background:var(--panel); border:1px solid var(--border); border-radius:5px; padding:8px 10px; font-size:11.5px; line-height:1.45; box-shadow:0 4px 14px rgba(0,0,0,.15); max-width:260px; display:none; z-index:5;}
+.tip b{font-family:"Space Grotesk",sans-serif;}
+.legend{margin-top:8px; max-width:520px;}
+.legend .bar-row{display:flex; height:14px; border-radius:3px; overflow:hidden; gap:2px;}
+.legend .bar-row i{flex:1; display:block;}
+.legend .lab-row{position:relative; height:16px; margin-top:3px; font-size:10.5px;}
+.legend .lab-row span{position:absolute; transform:translateX(-50%); white-space:nowrap; color:var(--ink-soft); font-weight:600;}
+.legend .lab-row span.end{font-weight:400; opacity:.85;}
+.legend .lab-row span.end.l{transform:none;} .legend .lab-row span.end.r{transform:translateX(-100%);}
+.legend-note{font-size:10.5px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+.keyrow{display:flex; gap:14px; flex-wrap:wrap; font-size:10.5px; color:var(--ink-soft); margin-top:6px; align-items:center;}
+.keyrow .k{display:inline-flex; align-items:center; gap:5px;}
+.keyrow svg{display:block;}
+/* right panel */
+.crumbs{font-size:12px; color:var(--ink-soft); margin-bottom:8px;}
+.crumbs button{background:none; border:none; color:var(--accent); cursor:pointer; font-size:12px; padding:0; font-family:inherit;}
+.crumbs .sep{margin:0 5px;}
+.sub2{font-size:11.5px; color:var(--ink-soft); margin:-4px 0 10px; line-height:1.5;}
+.miniStats{display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:12px 14px; margin:10px 0 4px;}
+.miniStats .m{font-size:11px; color:var(--ink-soft);}
+.miniStats .m b{display:block; font-size:15.5px; color:var(--ink); font-family:"Space Grotesk",sans-serif; font-weight:600;}
+.rankTag{display:inline-block; margin-top:3px; font-size:10px; padding:1px 6px; border-radius:8px; background:var(--chip); color:var(--ink-soft); font-weight:600;}
+.chartctrl{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:14px;}
+.chartbox{height:290px; margin-top:8px; position:relative;}
+.sectionh{font-size:12.5px; font-weight:600; margin:18px 0 8px; font-family:"Space Grotesk",sans-serif; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
+.list{display:flex; flex-direction:column; max-height:520px; overflow-y:auto; border-top:1px solid var(--border);}
+.row{padding:7px 4px; border-bottom:1px solid var(--border); cursor:pointer; background:var(--panel);}
+.row:hover{background:var(--panel-2);}
+.row.bench{background:var(--chip); font-weight:600; cursor:default;}
+.row.bench.click{cursor:pointer;}
+.row .top{display:flex; justify-content:space-between; gap:8px; align-items:baseline;}
+.row .nm{font-size:12.5px; overflow:hidden; text-overflow:ellipsis;}
+.row .nm small{color:var(--ink-soft); font-weight:400;}
+.row .v{font-size:12px; white-space:nowrap; font-family:"Space Grotesk",sans-serif;}
+.row .n{font-size:10.5px; color:var(--ink-soft); white-space:nowrap;}
+.bar{height:5px; background:var(--grid); border-radius:2px; margin-top:4px; overflow:hidden;}
+.bar i{display:block; height:100%; background:var(--accent-2); border-radius:2px;}
+.search{font-size:12px; background:var(--chip); color:var(--ink); border:1px solid var(--border); border-radius:5px; padding:5px 8px; font-family:inherit; width:200px; max-width:100%;}
+.empty{color:var(--ink-soft); font-size:12.5px; padding:26px 10px; text-align:center; line-height:1.6;}
+.tablewrap{max-height:360px; overflow:auto; border:1px solid var(--border); border-radius:4px;}
+table.dt{border-collapse:collapse; width:100%; font-size:11.5px;}
+table.dt th{position:sticky; top:0; background:var(--panel-2); text-align:right; padding:6px 8px; border-bottom:1px solid var(--border); font-weight:600; white-space:nowrap; cursor:pointer; user-select:none; z-index:1;}
+table.dt th:first-child, table.dt td:first-child{text-align:left;}
+table.dt td{padding:5px 8px; text-align:right; border-bottom:1px solid var(--grid); white-space:nowrap;}
+table.dt tr:hover td{background:var(--panel-2);}
+table.dt tr.bench td{background:var(--chip); font-weight:600;}
+table.dt tr.click{cursor:pointer;}
+table.dt td.l{text-align:left;}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:12px;}
+.kv dt{color:var(--ink-soft);} .kv dd{margin:0;}
+.xbox{border:1px solid var(--border); border-radius:5px; padding:10px 12px; background:var(--panel-2); margin-top:10px;}
+.xbox h4{margin:0 0 6px; font-size:12px; font-family:"Space Grotesk",sans-serif;}
+.xbox p{margin:4px 0; font-size:11.5px; color:var(--ink-soft); line-height:1.5;}
+.warnline{font-size:11px; color:var(--warn); margin-top:6px;}
+#compareWrap{margin-top:16px;}
+.note{font-size:11px; color:var(--ink-soft); margin-top:16px; line-height:1.65; border-top:1px solid var(--border); padding-top:10px;}
+.note p{margin:0 0 6px;}
+#loading{padding:60px 20px; text-align:center; color:var(--ink-soft);}
+::-webkit-scrollbar{width:8px; height:8px;} ::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Private Residential Explorer</h1>
+      <div class="sub">Every URA-caveated private home sale in Singapore, __EARLIEST_MONTH__ – __LATEST_MONTH__, by postal district and project. Condos, apartments, ECs and landed. History keeps growing: every daily pull is merged into a permanent archive, so nothing drops off when URA's 5-year window moves on.</div>
+    </div>
+    <div class="statbar">
+      <div class="stat"><b>__TOTAL_TX__</b>transactions archived</div>
+      <div class="stat"><b>__TOTAL_PROJECTS__</b>named projects</div>
+      <div class="stat"><b>__LATEST_MONTH__</b>latest contract month</div>
+      <div class="stat"><b>__PULLED_AT__</b>last URA pull</div>
+      <button class="themeBtn" id="themeBtn" title="Switch light / dark">◐ Theme</button>
+    </div>
+  </header>
+  <div id="loading">Loading transactions…</div>
+  <div id="app" style="display:none">
+
+  <div class="panel" id="filters">
+    <div class="fhead">
+      <h2>Filters</h2>
+      <span class="matchcount" id="matchCount"></span>
+      <span style="margin-left:auto; display:flex; gap:8px">
+        <button class="btn" id="fToggle">Hide filters</button>
+        <button class="btn" id="fReset">Reset all</button>
+      </span>
+    </div>
+    <div class="fgrid" id="fgrid">
+      <div class="fbox"><div class="lbl"><span>Property type</span></div>
+        <div class="pills" id="fPtype"></div>
+        <div class="pills" id="fPtypeQuick" style="margin-top:6px"></div></div>
+      <div class="fbox"><div class="lbl"><span>Type of sale</span></div><div class="pills" id="fSale"></div>
+        <div class="lbl" style="margin-top:12px"><span>Market segment</span></div><div class="pills" id="fSeg"></div></div>
+      <div class="fbox"><div class="lbl"><span>Tenure</span></div><div class="pills" id="fKind"></div>
+        <div class="lbl" style="margin-top:12px"><span>Remaining lease (leasehold only)</span><b id="leaseLbl"></b></div>
+        <div class="rangewrap"><input type="range" id="leaseLo" aria-label="Minimum remaining lease"><input type="range" id="leaseHi" aria-label="Maximum remaining lease"></div></div>
+      <div class="fbox"><div class="lbl"><span>Floor range</span><b id="floorLbl"></b></div>
+        <div class="rangewrap"><input type="range" id="floorLo" aria-label="Lowest floor band"><input type="range" id="floorHi" aria-label="Highest floor band"></div>
+        <label class="chk"><input type="checkbox" id="floorNone" checked> Include homes with no floor band (landed)</label></div>
+      <div class="fbox"><div class="lbl"><span>Units in the transaction</span></div><div class="pills" id="fUnits"></div>
+        <div class="legend-note" style="margin-top:6px">Bulk caveats (en-bloc / multi-unit) record the lot's total price and total area, so they distort price figures; $psf stays valid.</div></div>
+      <div class="fbox"><div class="lbl"><span>Transacted price (S$)</span></div>
+        <div class="numpair"><input type="number" id="prMin" placeholder="min" min="0" step="10000"><span>–</span><input type="number" id="prMax" placeholder="max" min="0" step="10000"></div>
+        <div class="lbl" style="margin-top:10px"><span>Price per sq ft (S$ psf)</span></div>
+        <div class="numpair"><input type="number" id="psfMin" placeholder="min" min="0" step="50"><span>–</span><input type="number" id="psfMax" placeholder="max" min="0" step="50"></div></div>
+      <div class="fbox"><div class="lbl"><span>Area (sq ft)</span><span class="hint">floor area for strata, land area for landed</span></div>
+        <div class="numpair"><input type="number" id="arMin" placeholder="min" min="0" step="50"><span>–</span><input type="number" id="arMax" placeholder="max" min="0" step="50"></div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel" id="mapPanel">
+      <h2>Singapore by postal district <span class="hint">click a district · hover for figures</span></h2>
+      <div class="ctrlrow">
+        <div class="fbox"><div class="lbl"><span>Statistic (applies everywhere)</span></div><div class="pills" id="statPills"></div></div>
+        <div class="fbox"><div class="lbl"><span>Overlay</span></div><div class="pills" id="overlayPills"></div></div>
+      </div>
+      <div class="timebox">
+        <div class="lbl" style="font-size:11px;color:var(--ink-soft);display:flex;justify-content:space-between;margin-bottom:6px"><span>Time range (applies everywhere)</span><b id="timeLbl" style="color:var(--ink)"></b></div>
+        <div class="rangewrap"><input type="range" id="qLo" aria-label="Start quarter"><input type="range" id="qHi" aria-label="End quarter"></div>
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:6px">
+          <div class="presets" id="presets"></div>
+          <div style="display:flex; gap:6px; align-items:center"><span class="hint">Periods</span><div class="pills" id="granPills"></div></div>
+        </div>
+      </div>
+      <div class="fbox" style="margin-bottom:10px"><div class="lbl"><span>Colour districts by</span></div><div class="pills" id="metricPills"></div></div>
+      <div class="mapbox" id="mapbox">
+        <svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of Singapore's 28 postal districts"></svg>
+        <button class="btn zoomBtn" id="zoomBtn" style="background:var(--panel)">⤢ Whole island</button>
+        <div class="tip" id="tip"></div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="keyrow" id="keyrow"></div>
+      <div class="legend-note">District shapes are drawn from where each district's projects sit, clipped to URA's official coastline. Postal districts have no official boundary file, so edges are approximate.</div>
+    </div>
+
+    <div class="panel" id="detail">
+      <h2 id="dTitle">All Singapore</h2>
+      <div class="crumbs" id="crumbs"></div>
+      <div id="dBody"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="compareWrap">
+    <h2>Compare districts <span class="hint">same filters, statistic and time range as the map · click a column to sort · click a row to open</span></h2>
+    <div class="tablewrap" style="max-height:560px"><table class="dt" id="cmpTable"></table></div>
+  </div>
+
+  <div class="note" id="footnote"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ======================= constants & helpers =======================
+const SQFT = 10.7639;
+const STAT_LABEL = {median:'Median', mean:'Mean', low:'Lowest', high:'Highest'};
+const SALE_LABEL = {1:'New sale', 2:'Sub sale', 3:'Resale'};
+const KIND_LABEL = {FH:'Freehold', '999':'999-yr (900+ yrs)', LH:'Leasehold (99-yr etc.)', UNK:'Unknown'};
+const UNITS_OPTS = [['single','Single unit'],['bulk','Bulk (2+ units)'],['all','Both']];
+const MIN_N_GROWTH = 3; // a period needs at least this many transactions to anchor CAGR / growth
+const MIN_YRS_GROWTH = 1; // and the two anchor periods must be at least this far apart
+const PTYPE_GROUPS = {'Apartment':'Apartment','Condominium':'Condominium','Executive Condominium':'Executive condo',
+  'Strata Terrace':'Strata landed','Strata Semi-detached':'Strata landed','Strata Detached':'Strata landed',
+  'Terrace':'Landed','Semi-detached':'Landed','Detached':'Landed'};
+const QUICK = [['Non-landed',['Apartment','Condominium']],['+ EC',['Apartment','Condominium','Executive Condominium']],
+  ['Landed only',['Strata Terrace','Strata Semi-detached','Strata Detached','Terrace','Semi-detached','Detached']],['All',null]];
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtMoney(v, compact){ if(v==null||!isFinite(v)) return '—';
+  if(compact||Math.abs(v)>=1e6){ if(Math.abs(v)>=1e9) return '$'+(v/1e9).toFixed(2)+'B'; if(Math.abs(v)>=1e6) return '$'+(v/1e6).toFixed(Math.abs(v)>=1e7?1:2)+'M'; if(Math.abs(v)>=1e3) return '$'+Math.round(v/1e3)+'k'; }
+  return '$'+Math.round(v).toLocaleString('en-SG'); }
+const fmtPsf = v => v==null||!isFinite(v)?'—':'$'+Math.round(v).toLocaleString('en-SG');
+const fmtArea = v => v==null||!isFinite(v)?'—':Math.round(v).toLocaleString('en-SG')+' sqft';
+const fmtAreaBoth = v => v==null||!isFinite(v)?'—':`${Math.round(v).toLocaleString('en-SG')} sqft <small style="color:var(--ink-soft)">(${Math.round(v/SQFT).toLocaleString('en-SG')} sqm)</small>`;
+const fmtYrs = v => v==null||!isFinite(v)?'—':v.toFixed(1)+' yrs';
+const fmtPct = v => v==null||!isFinite(v)?'—':(v>0?'+':'')+v.toFixed(1)+'%';
+const fmtN = v => v==null?'—':Math.round(v).toLocaleString('en-SG');
+const fmtVel = v => v==null||!isFinite(v)?'—':(v>=10?Math.round(v).toLocaleString('en-SG'):v.toFixed(1))+'/yr';
+
+// ======================= state =======================
+let D, M;                      // tx data, map data
+let N = 0;                     // rows
+let PSF, AREA, QA, YR;         // derived per-row arrays
+let QMIN, QMAX, MI_MIN, MI_MAX;
+let mask;                      // Uint8Array, rows passing every filter incl. time
+const S = { stat:'median', gran:'auto', metric:'psf', overlay:'segments', q0:0, q1:0,
+  ptypes:null, sales:new Set([1,2,3]), kinds:null, segs:new Set([0,1,2]), lease:[0,105], floorLo:0, floorHi:0, floorNone:true,
+  units:'single', prMin:null, prMax:null, psfMin:null, psfMax:null, arMin:null, arMax:null };
+const V = { minTx:1, level:'sg', d:null, p:null, seg:null, chartMetric:'psf', breakdown:'none', listMetric:'psf', listSort:'desc', search:'', txSort:{k:'mi',dir:-1}, showPeriodTable:false };
+let cmpSort = {k:'d', dir:1};
+let chart = null;
+
+// ======================= load =======================
+Promise.all([fetch('data/tx.json').then(r=>r.json()), fetch('data/map.json').then(r=>r.json())]).then(([tx, map])=>{
+  D = tx; M = map; init();
+}).catch(e=>{ $('loading').textContent = 'Could not load data: '+e; console.error(e); });
+
+function init(){
+  const c = D.cols; N = c.mi.length;
+  PSF = new Float64Array(N); AREA = new Float64Array(N); QA = new Int32Array(N); YR = new Int32Array(N);
+  for(let i=0;i<N;i++){ const sqft = c.a[i]/10*SQFT; AREA[i]=sqft; PSF[i]=c.pr[i]/sqft; QA[i]=Math.floor(c.mi[i]/3); YR[i]=D.base_year+Math.floor(c.mi[i]/12); }
+  MI_MIN = c.mi[0]; MI_MAX = c.mi[N-1]; for(let i=0;i<N;i++){ if(c.mi[i]<MI_MIN) MI_MIN=c.mi[i]; if(c.mi[i]>MI_MAX) MI_MAX=c.mi[i]; }
+  QMIN = Math.floor(MI_MIN/3); QMAX = Math.floor(MI_MAX/3);
+  S.q0 = QMIN; S.q1 = QMAX;
+  S.ptypes = new Set(D.dict.ptype.map((_,i)=>i));
+  S.kinds = new Set(D.dict.kind.map((_,i)=>i));
+  S.floorLo = firstFloorIdx(); S.floorHi = D.dict.floor.length-1;
+  buildFilters(); buildMapControls(); buildMap();
+  $('loading').style.display='none'; $('app').style.display='';
+  recompute();
+  $('footnote').innerHTML = footnote();
+}
+const firstFloorIdx = () => D.dict.floor[0]==='-' ? 1 : 0;
+
+// ======================= period helpers =======================
+const qLabel = q => `${D.base_year+Math.floor(q/4)} Q${q%4+1}`;
+const effGran = () => S.gran==='auto' ? ((S.q1-S.q0+1)<=24?'quarter':'year') : S.gran;
+function periodOf(i, g){ return g==='quarter' ? QA[i] : YR[i]; }
+function periodLabel(p, g){ return g==='quarter' ? qLabel(p) : String(p); }
+function periodPartial(p, g){ // does the period extend beyond the data we hold?
+  const [m0,m1] = g==='quarter' ? [p*3, p*3+2] : [(p-D.base_year)*12, (p-D.base_year)*12+11];
+  const lo = Math.max(m0, S.q0*3), hi = Math.min(m1, S.q1*3+2);
+  return lo < MI_MIN || hi > MI_MAX || lo>m0 || hi<m1;
+}
+function rangeYears(){ // span of the selected range that is actually covered by data, in years
+  const lo = Math.max(S.q0*3, MI_MIN), hi = Math.min(S.q1*3+2, MI_MAX);
+  return Math.max(1, hi-lo+1)/12;
+}
+
+// ======================= filtering =======================
+function recomputeMask(){
+  const c = D.cols; mask = new Uint8Array(N);
+  const ptOK = new Uint8Array(D.dict.ptype.length); S.ptypes.forEach(i=>ptOK[i]=1);
+  const kOK = new Uint8Array(4); S.kinds.forEach(i=>kOK[i]=1);
+  const fullLease = S.lease[0]<=0 && S.lease[1]>=105;
+  const fNone = D.dict.floor.indexOf('-');
+  const fullFloor = S.floorLo<=firstFloorIdx() && S.floorHi>=D.dict.floor.length-1;
+  const lh = D.dict.kind.indexOf('LH');
+  const lo = S.q0*3, hi = S.q1*3+2;
+  const a0 = S.arMin, a1 = S.arMax, p0=S.prMin, p1=S.prMax, s0=S.psfMin, s1=S.psfMax;
+  let n=0;
+  for(let i=0;i<N;i++){
+    const mi = c.mi[i]; if(mi<lo||mi>hi) continue;
+    if(!ptOK[c.t[i]]) continue;
+    if(!S.sales.has(c.s[i])) continue;
+    if(!S.segs.has(c.g[i])) continue;
+    const k=c.k[i]; if(!kOK[k]) continue;
+    if(k===lh && !fullLease){ const r=c.rl[i]; if(r<0 || r/10<S.lease[0] || r/10>S.lease[1]) continue; }
+    const f=c.f[i];
+    if(f===fNone){ if(!S.floorNone) continue; } else if(!fullFloor && (f<S.floorLo||f>S.floorHi)) continue;
+    const u=c.u[i]; if(S.units==='single' && u>1) continue; if(S.units==='bulk' && u<2) continue;
+    const pr=c.pr[i]; if(p0!=null && pr<p0) continue; if(p1!=null && pr>p1) continue;
+    const ps=PSF[i]; if(s0!=null && ps<s0) continue; if(s1!=null && ps>s1) continue;
+    const ar=AREA[i]; if(a0!=null && ar<a0) continue; if(a1!=null && ar>a1) continue;
+    mask[i]=1; n++;
+  }
+  return n;
+}
+
+// ======================= statistics =======================
+// group summary from a list of row indices (already filtered)
+function summarize(idx){
+  const n = idx.length; if(!n) return {n:0};
+  const c = D.cols; const pr=new Float64Array(n), ps=new Float64Array(n), ar=new Float64Array(n); const ls=[];
+  let units=0;
+  for(let j=0;j<n;j++){ const i=idx[j]; pr[j]=c.pr[i]; ps[j]=PSF[i]; ar[j]=AREA[i]; units+=c.u[i]; if(c.rl[i]>=0 && D.dict.kind[c.k[i]]==='LH') ls.push(c.rl[i]/10); }
+  return {n, units, PRICE:dstat(pr), PSF:dstat(ps), AREA:dstat(ar), LEASE:dstat(Float64Array.from(ls))};
+}
+function dstat(a){ const n=a.length; if(!n) return null; a.sort(); let s=0; for(let i=0;i<n;i++) s+=a[i];
+  const med = n%2 ? a[(n-1)/2] : (a[n/2-1]+a[n/2])/2; return {mean:s/n, median:med, low:a[0], high:a[n-1], n}; }
+const pick = (sum, dim) => sum && sum[dim] ? sum[dim][S.stat] : null;
+function nContext(n){ return S.stat==='low' ? `lowest of ${fmtN(n)} tx` : S.stat==='high' ? `highest of ${fmtN(n)} tx` : `n = ${fmtN(n)}`; }
+
+// per-period values of one dimension for a group, under the current statistic
+function periodSeries(idx, dim, g){
+  const by = new Map(); const c=D.cols;
+  for(const i of idx){ const p=periodOf(i,g); let a=by.get(p); if(!a){a=[];by.set(p,a);} a.push(i); }
+  const keys=[...by.keys()].sort((a,b)=>a-b);
+  return keys.map(p=>{ const rows=by.get(p); const vals=new Float64Array(rows.length); let k=0;
+    if(dim==='PRICE') for(const i of rows) vals[k++]=c.pr[i]; else for(const i of rows) vals[k++]=PSF[i];
+    const st=dstat(vals); return {p, n:rows.length, v:st[S.stat]}; });
+}
+function growth(idx, dim){
+  const g=effGran(); const ser=periodSeries(idx, dim, g).filter(x=>x.n>=MIN_N_GROWTH);
+  if(ser.length<2) return {cagr:null, total:null};
+  const a=ser[0], b=ser[ser.length-1]; const yrs = g==='quarter' ? (b.p-a.p)/4 : (b.p-a.p);
+  if(yrs<MIN_YRS_GROWTH || !(a.v>0)) return {cagr:null,total:null};
+  const tot=b.v/a.v; return {cagr:(Math.pow(tot,1/yrs)-1)*100, total:(tot-1)*100, from:periodLabel(a.p,g), to:periodLabel(b.p,g), yrs};
+}
+
+// metric catalogue: one definition used by map, compare table, project list and ranks
+const RM = {
+  price:     {get label(){return `${STAT_LABEL[S.stat]} price`;}, short:'Price', calc:(idx,sum)=>pick(sum,'PRICE'), fmt:v=>fmtMoney(v), fmtC:v=>fmtMoney(v,true)},
+  psf:       {get label(){return `${STAT_LABEL[S.stat]} $psf`;}, short:'$psf', calc:(idx,sum)=>pick(sum,'PSF'), fmt:fmtPsf, fmtC:fmtPsf},
+  area:      {get label(){return `${STAT_LABEL[S.stat]} area`;}, short:'Area', calc:(idx,sum)=>pick(sum,'AREA'), fmt:fmtArea, fmtC:v=>v==null?'—':Math.round(v).toLocaleString('en-SG')},
+  lease:     {get label(){return `${STAT_LABEL[S.stat]} lease left`;}, short:'Lease left', calc:(idx,sum)=>pick(sum,'LEASE'), fmt:fmtYrs, fmtC:v=>v==null?'—':v.toFixed(0)+'y', note:'leasehold rows only'},
+  cagr_psf:  {label:'CAGR, $psf', short:'CAGR $psf', calc:idx=>growth(idx,'PSF').cagr, fmt:fmtPct, fmtC:fmtPct, div:true},
+  cagr_price:{label:'CAGR, price', short:'CAGR price', calc:idx=>growth(idx,'PRICE').cagr, fmt:fmtPct, fmtC:fmtPct, div:true},
+  tot_psf:   {label:'Total growth, $psf', short:'Growth $psf', calc:idx=>growth(idx,'PSF').total, fmt:fmtPct, fmtC:fmtPct, div:true},
+  tot_price: {label:'Total growth, price', short:'Growth price', calc:idx=>growth(idx,'PRICE').total, fmt:fmtPct, fmtC:fmtPct, div:true},
+  velocity:  {label:'Velocity (tx per year)', short:'Velocity', calc:(idx)=>idx.length? idx.length/rangeYears():null, fmt:fmtVel, fmtC:v=>v==null?'—':(v>=10?Math.round(v):v.toFixed(1)), noStat:true},
+};
+const MAP_METRICS = ['psf','price','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','velocity'];
+
+// ======================= grouping =======================
+let BY_D = null, BY_SEG = null, ALL = null, SUM_D = null;
+function groupAll(){
+  const c=D.cols; BY_D = Array.from({length:29},()=>[]); BY_SEG=[[],[],[]]; ALL=[];
+  for(let i=0;i<N;i++){ if(!mask[i]) continue; ALL.push(i); BY_D[c.d[i]].push(i); if(c.g[i]>=0) BY_SEG[c.g[i]].push(i); }
+  SUM_D = BY_D.map(idx=>summarize(idx));
+}
+const metricCache = new Map();
+function districtMetric(key, d){ const ck=key+'|'+d; if(metricCache.has(ck)) return metricCache.get(ck);
+  const v = RM[key].calc(BY_D[d], SUM_D[d]); metricCache.set(ck,v); return v; }
+function rankAmong(entries, ownKey){ // entries: [{k, v}]
+  const e = entries.filter(x=>x.v!=null && isFinite(x.v)).sort((a,b)=>b.v-a.v);
+  const i = e.findIndex(x=>x.k===ownKey); return i<0?'':`#${i+1} of ${e.length}`;
+}
+
+// ======================= orchestration =======================
+let raf = null;
+function recompute(){ if(raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(()=>{ raf=null; doRecompute(); }); }
+function doRecompute(){
+  const n = recomputeMask(); metricCache.clear(); groupAll();
+  $('matchCount').innerHTML = `<b>${fmtN(n)}</b> of ${fmtN(N)} transactions match · ${esc(qLabel(S.q0))} – ${esc(qLabel(S.q1))}${mixWarning()}`;
+  updateTimeLabel(); renderMap(); renderDetail(); renderCompare();
+}
+function mixWarning(){ const c=D.cols; let land=0, strata=0; for(const i of ALL){ if(c.ar[i]) land++; else strata++; if(land&&strata) break; }
+  return land&&strata ? ` · <span style="color:var(--warn)">mixes landed (land-area $psf) with strata (floor-area $psf)</span>` : ''; }
+
+// ======================= filters UI =======================
+function pillGroup(el, items, isOn, onClick){ el.innerHTML=''; items.forEach(([val,label,title])=>{ const s=document.createElement('span');
+  s.className='pill'+(isOn(val)?' on':''); s.textContent=label; s.tabIndex=0; s.setAttribute('role','button'); if(title) s.title=title;
+  s.onclick=()=>onClick(val); s.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); onClick(val);} }; el.appendChild(s); }); }
+function toggleSet(set, v, all){ if(set.has(v)){ if(set.size>1) set.delete(v); } else set.add(v); }
+function buildFilters(){
+  const cnt = (col, v) => { let n=0; const a=D.cols[col]; for(let i=0;i<N;i++) if(a[i]===v) n++; return n; };
+  const ptCounts = D.dict.ptype.map((_,i)=>cnt('t',i));
+  const drawPt = ()=>{ pillGroup($('fPtype'), D.dict.ptype.map((p,i)=>[i,p,`${fmtN(ptCounts[i])} transactions in archive`]), v=>S.ptypes.has(v), v=>{ toggleSet(S.ptypes,v); drawPt(); recompute(); }); };
+  drawPt();
+  pillGroup($('fPtypeQuick'), QUICK.map(([l])=>[l,l]), ()=>false, l=>{ const q=QUICK.find(x=>x[0]===l)[1];
+    S.ptypes = new Set(q? q.map(n=>D.dict.ptype.indexOf(n)).filter(i=>i>=0) : D.dict.ptype.map((_,i)=>i)); drawPt(); recompute(); });
+  [...$('fPtypeQuick').children].forEach(s=>s.classList.add('ghost'));
+  const drawSale=()=>pillGroup($('fSale'), [1,2,3].map(v=>[v,SALE_LABEL[v]]), v=>S.sales.has(v), v=>{toggleSet(S.sales,v); drawSale(); recompute();}); drawSale();
+  const drawSeg=()=>pillGroup($('fSeg'), D.dict.seg.map((s,i)=>[i,s,{CCR:'Core Central Region',RCR:'Rest of Central Region',OCR:'Outside Central Region'}[s]]), v=>S.segs.has(v), v=>{toggleSet(S.segs,v); drawSeg(); recompute();}); drawSeg();
+  const kc = D.dict.kind.map((_,i)=>cnt('k',i));
+  const drawKind=()=>pillGroup($('fKind'), D.dict.kind.map((k,i)=>[i,KIND_LABEL[k]||k]).filter(([i])=>kc[i]>0), v=>S.kinds.has(v), v=>{toggleSet(S.kinds,v); drawKind(); recompute();}); drawKind();
+  const drawUnits=()=>pillGroup($('fUnits'), UNITS_OPTS, v=>S.units===v, v=>{S.units=v; drawUnits(); recompute();}); drawUnits();
+  // lease slider
+  dualRange('leaseLo','leaseHi',0,105,1,()=>S.lease,v=>{S.lease=v;}, v=> (v[0]<=0&&v[1]>=105)?'any':`${v[0]}–${v[1]} yrs`, 'leaseLbl');
+  // floor slider
+  const f0=firstFloorIdx(), f1=D.dict.floor.length-1;
+  dualRange('floorLo','floorHi',f0,f1,1,()=>[S.floorLo,S.floorHi],v=>{S.floorLo=v[0];S.floorHi=v[1];}, v=> (v[0]<=f0&&v[1]>=f1)?'any':`${D.dict.floor[v[0]]} to ${D.dict.floor[v[1]]}`, 'floorLbl');
+  $('floorNone').onchange=e=>{S.floorNone=e.target.checked; recompute();};
+  const num = (id,key)=>{ $(id).oninput=debounce(e=>{ const v=e.target.value.trim(); S[key]= v===''?null:Number(v); recompute(); },350); };
+  num('prMin','prMin'); num('prMax','prMax'); num('psfMin','psfMin'); num('psfMax','psfMax'); num('arMin','arMin'); num('arMax','arMax');
+  $('fToggle').onclick=()=>{ const g=$('fgrid'); g.classList.toggle('collapsed'); $('fToggle').textContent = g.classList.contains('collapsed')?'Show filters':'Hide filters'; };
+  $('fReset').onclick=()=>{ S.ptypes=new Set(D.dict.ptype.map((_,i)=>i)); S.sales=new Set([1,2,3]); S.segs=new Set([0,1,2]); S.kinds=new Set(D.dict.kind.map((_,i)=>i));
+    S.lease=[0,105]; S.floorLo=f0; S.floorHi=f1; S.floorNone=true; S.units='single'; ['prMin','prMax','psfMin','psfMax','arMin','arMax'].forEach(k=>{S[k]=null;});
+    ['prMin','prMax','psfMin','psfMax','arMin','arMax'].forEach(id=>$(id).value=''); $('floorNone').checked=true; buildFilters(); recompute(); };
+}
+const dualSetters = {};
+function dualRange(idLo,idHi,min,max,step,get,set,label,lblId){
+  const lo=$(idLo), hi=$(idHi); [lo,hi].forEach(e=>{e.min=min; e.max=max; e.step=step;});
+  const v=get(); lo.value=v[0]; hi.value=v[1]; $(lblId).textContent=label(v);
+  const upd=(which)=>{ let a=+lo.value, b=+hi.value; if(a>b){ if(which==='lo') a=b; else b=a; lo.value=a; hi.value=b; } set([a,b]); $(lblId).textContent=label([a,b]); recompute(); };
+  lo.oninput=()=>upd('lo'); hi.oninput=()=>upd('hi');
+  dualSetters[idLo]=(a,b)=>{ lo.value=a; hi.value=b; $(lblId).textContent=label([a,b]); };
+}
+function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+
+function buildMapControls(){
+  const drawStat=()=>pillGroup($('statPills'), Object.entries(STAT_LABEL), v=>S.stat===v, v=>{S.stat=v; drawStat(); drawMetric(); recompute();}); drawStat();
+  const drawMetric=()=>pillGroup($('metricPills'), MAP_METRICS.map(k=>[k, RM[k].label]), v=>S.metric===v, v=>{S.metric=v; drawMetric(); recompute();});
+  window._drawMetric = drawMetric; drawMetric();
+  const drawOv=()=>pillGroup($('overlayPills'), [['segments','CCR / RCR / OCR'],['none','None']], v=>S.overlay===v, v=>{S.overlay=v; drawOv(); renderMap();}); drawOv();
+  const drawGran=()=>pillGroup($('granPills'), [['auto','Auto'],['year','Yearly'],['quarter','Quarterly']], v=>S.gran===v, v=>{S.gran=v; drawGran(); recompute();}); drawGran();
+  const lo=$('qLo'), hi=$('qHi'); [lo,hi].forEach(e=>{e.min=QMIN; e.max=QMAX; e.step=1;}); lo.value=S.q0; hi.value=S.q1;
+  const upd=(w)=>{ let a=+lo.value,b=+hi.value; if(a>b){ if(w==='lo') a=b; else b=a; lo.value=a; hi.value=b; } S.q0=a; S.q1=b; recompute(); };
+  lo.oninput=()=>upd('lo'); hi.oninput=()=>upd('hi');
+  const spanQ = QMAX-QMIN+1;
+  const presets=[['All',spanQ],['10Y',40],['5Y',20],['3Y',12],['2Y',8],['1Y',4],['Latest Q',1]].filter(([l,q],i)=>i===0||q<spanQ);
+  pillGroup($('presets'), presets.map(([l,q])=>[q,l]), ()=>false, q=>{ S.q1=QMAX; S.q0=Math.max(QMIN,QMAX-q+1); lo.value=S.q0; hi.value=S.q1; recompute(); });
+  $('themeBtn').onclick=()=>{ const r=document.documentElement; const dark = r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    r.dataset.theme = dark?'light':'dark'; try{localStorage.setItem('theme',r.dataset.theme);}catch(e){} renderMap(); renderDetail(); };
+  try{ const t=localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme=t; }catch(e){}
+}
+function updateTimeLabel(){ const g=effGran(); $('timeLbl').textContent = `${qLabel(S.q0)} – ${qLabel(S.q1)} · ${((S.q1-S.q0+1)/4).toFixed(2).replace(/\.?0+$/,'')} yrs · ${g==='quarter'?'quarterly':'yearly'} periods`; }
+
+// ======================= map =======================
+const SVGNS='http://www.w3.org/2000/svg';
+let distEls = {}, labEls = {};
+function el(tag, attrs, parent){ const e=document.createElementNS(SVGNS, tag); for(const k in attrs) e.setAttribute(k, attrs[k]); if(parent) parent.appendChild(e); return e; }
+function buildMap(){
+  const svg=$('map'); const vb=M.viewBox; svg.setAttribute('viewBox', vb.join(' ')); svg.style.aspectRatio = vb[2]+' / '+vb[3];
+  const defs=el('defs',{},svg); const pat=el('pattern',{id:'hatch',width:6,height:6,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);
+  el('rect',{width:6,height:6,fill:'var(--null)'},pat); el('line',{x1:0,y1:0,x2:0,y2:6,stroke:'var(--border)','stroke-width':2},pat);
+  const gD=el('g',{id:'gDist'},svg);
+  Object.entries(M.districts).forEach(([k,v])=>{ const p=el('path',{d:v.path,class:'dist','data-d':k, tabindex:0, role:'button','aria-label':`District ${k}`},gD);
+    p.addEventListener('mousemove',e=>showTip(e,k)); p.addEventListener('mouseleave',hideTip);
+    p.addEventListener('click',()=>openDistrict(+k)); p.addEventListener('keydown',e=>{ if(e.key==='Enter') openDistrict(+k); });
+    distEls[k]=p; });
+  el('g',{id:'gSeg'},svg); el('g',{id:'gDots'},svg);
+  const gL=el('g',{id:'gLab'},svg);
+  Object.entries(M.districts).forEach(([k,v])=>{ const t=el('text',{x:v.label[0], y:v.label[1], class:'dlab'},gL); t.textContent=k;
+    const tv=el('text',{x:v.label[0], y:v.label[1]+13, class:'dval'},gL); labEls[k]=[t,tv]; });
+  const gS=$('gSeg');
+  Object.entries(M.segments).forEach(([k,v])=>{ if(k==='OCR') return; el('path',{d:v.path,class:'seg-outline '+k},gS); });
+}
+function colourScale(vals, diverging){
+  const v=vals.filter(x=>x!=null&&isFinite(x)).sort((a,b)=>a-b); if(!v.length) return null;
+  if(diverging){
+    const neg=v.filter(x=>x<0).map(x=>-x).sort((a,b)=>a-b), pos=v.filter(x=>x>=0).sort((a,b)=>a-b);
+    const q=(a,f)=>a.length?a[Math.min(a.length-1,Math.round(f*(a.length-1)))]:0;
+    const b={n1:q(neg,1/3), n2:q(neg,2/3), p1:q(pos,1/3), p2:q(pos,2/3)};
+    const cols=['--div-n3','--div-n2','--div-n1','--div-p1','--div-p2','--div-p3'].map(css);
+    const f=x=> x<0 ? (-x>b.n2?cols[0]:-x>b.n1?cols[1]:cols[2]) : (x>b.p2?cols[5]:x>b.p1?cols[4]:cols[3]);
+    return {f, div:true, cols, b, min:v[0], max:v[v.length-1], hasNeg:neg.length>0, hasPos:pos.length>0};
+  }
+  const k=5; const br=Array.from({length:k+1},(_,i)=>v[Math.min(v.length-1,Math.round(i/k*(v.length-1)))]);
+  const cols=['--seq-1','--seq-2','--seq-3','--seq-4','--seq-5'].map(css);
+  const f=x=>{ for(let i=1;i<k;i++) if(x<br[i]) return cols[i-1]; return cols[k-1]; };
+  return {f, br, cols};
+}
+function inkFor(bg){ const m=bg.match(/^#?([0-9a-f]{6})$/i); if(!m) return css('--ink'); const n=parseInt(m[1],16); const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  const L=(0.2126*r+0.7152*g+0.0722*b)/255; return L>0.55?'#14201C':'#F4F7F6'; }
+let SCALE=null;
+function renderMap(){
+  if(!BY_D) return;
+  const key=S.metric, rm=RM[key];
+  const vals={}; for(let d=1; d<=28; d++){ vals[d]=districtMetric(key,d); }
+  SCALE = colourScale(Object.values(vals), !!rm.div);
+  Object.entries(distEls).forEach(([k,p])=>{ const v=vals[+k];
+    if(v==null||!isFinite(v)||!SCALE){ p.setAttribute('class','dist null'+(V.d===+k?' sel':'')); p.style.fill=''; }
+    else { p.setAttribute('class','dist'+(V.d===+k?' sel':'')); p.style.fill=SCALE.f(v); }
+    const [t,tv]=labEls[k]; const fill = (v==null||!SCALE)? css('--null') : SCALE.f(v); const ink=inkFor(fill);
+    t.style.fill=ink; tv.style.fill=ink; const big=(M.districts[k].area_km2||0)>=7;
+    tv.textContent = big && v!=null ? rm.fmtC(v) : '';
+  });
+  // selected district on top
+  if(V.d){ const p=distEls[String(V.d).padStart(2,'0')]; if(p) p.parentNode.appendChild(p); }
+  $('gSeg').style.display = S.overlay==='segments'?'':'none';
+  if(!$('zoomBtn').onclick) $('zoomBtn').onclick=()=>{ zoomOn=!zoomOn; applyZoom(); };
+  renderDots(); renderLegend(rm, vals); applyZoom();
+}
+let zoomOn = true;
+function applyZoom(){
+  const svg=$('map'); const vb=M.viewBox; let box=[...vb];
+  const want = V.d && zoomOn;
+  if(want){ const p=distEls[String(V.d).padStart(2,'0')]; const b=p.getBBox(); const pad=Math.max(b.width,b.height)*0.35+20;
+    let x=b.x-pad, y=b.y-pad, w=b.width+2*pad, h=b.height+2*pad; const ar=vb[2]/vb[3];
+    if(w/h<ar){ const nw=h*ar; x-=(nw-w)/2; w=nw; } else { const nh=w/ar; y-=(nh-h)/2; h=nh; }
+    box=[x,y,w,h]; }
+  svg.setAttribute('viewBox', box.map(v=>v.toFixed(1)).join(' '));
+  const k = box[2]/vb[2];
+  svg.querySelectorAll('.dlab').forEach(t=>t.style.fontSize=(13*Math.max(k,0.45))+'px');
+  svg.querySelectorAll('.dval').forEach(t=>{ t.style.fontSize=(10.5*Math.max(k,0.45))+'px'; t.setAttribute('dy', (13*Math.max(k,0.45)-13).toFixed(1)); });
+  svg.querySelectorAll('.pdot').forEach(c=>c.setAttribute('r', (c.dataset.r*Math.max(k,0.35)).toFixed(2)));
+  $('zoomBtn').style.display = V.d ? 'inline-block' : 'none'; $('zoomBtn').textContent = zoomOn ? '⤢ Whole island' : '⤡ Zoom to district';
+}
+function renderDots(){
+  const g=$('gDots'); g.innerHTML='';
+  if(!V.d) return;
+  const c=D.cols; const cnt=new Map(); for(const i of BY_D[V.d]){ cnt.set(c.p[i],(cnt.get(c.p[i])||0)+1); }
+  const mx=Math.max(1,...cnt.values());
+  cnt.forEach((n,pi)=>{ const P=D.projects[pi]; if(P[4]==null||P[7]) return;
+    const r0=(2.6+6*Math.sqrt(n/mx)).toFixed(1); const dot=el('circle',{cx:P[4], cy:P[5], r:r0, 'data-r':r0, class:'pdot'+(V.p===pi?' sel':'')},g);
+    dot.addEventListener('mousemove',e=>showTipProject(e,pi,n)); dot.addEventListener('mouseleave',hideTip);
+    dot.addEventListener('click',ev=>{ ev.stopPropagation(); openProject(pi); }); });
+}
+function renderLegend(rm, vals){
+  const L=$('legend');
+  if(!SCALE){ L.innerHTML='<div class="legend-note">No district has data under the current filters.</div>'; $('keyrow').innerHTML=''; return; }
+  const fc=rm.fmtC;
+  if(SCALE.div){
+    const b=SCALE.b;
+    L.innerHTML=`<div class="bar-row">${SCALE.cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
+      <div class="lab-row"><span class="end l" style="left:0">${fc(SCALE.min)}</span><span style="left:16.67%">${SCALE.hasNeg?'−'+fc(b.n2).replace(/^[+−-]/,''):''}</span><span style="left:33.33%">${SCALE.hasNeg?'−'+fc(b.n1).replace(/^[+−-]/,''):''}</span><span style="left:50%">0%</span><span style="left:66.67%">${SCALE.hasPos?fc(b.p1):''}</span><span style="left:83.33%">${SCALE.hasPos?fc(b.p2):''}</span><span class="end r" style="left:100%">${fc(SCALE.max)}</span></div>
+      <div class="legend-note">${esc(rm.label)} · amber = fell, teal = rose · each side split into thirds of the districts on that side · endpoints are the periods with ≥${MIN_N_GROWTH} transactions</div>`;
+  } else {
+    const br=SCALE.br;
+    L.innerHTML=`<div class="bar-row">${SCALE.cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
+      <div class="lab-row"><span class="end l" style="left:0">${fc(br[0])}</span>${[1,2,3,4].map(i=>`<span style="left:${i*20}%">${fc(br[i])}</span>`).join('')}<span class="end r" style="left:100%">${fc(br[5])}</span></div>
+      <div class="legend-note">${esc(rm.label)}${rm.note?' ('+rm.note+')':''} · 5 classes with roughly equal numbers of districts in each</div>`;
+  }
+  const nulls=Object.values(vals).filter(v=>v==null).length;
+  $('keyrow').innerHTML = `${S.overlay==='segments'?`<span class="k"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="${css('--ccr')}" stroke-width="2.6"/></svg>CCR boundary</span><span class="k"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="${css('--rcr')}" stroke-width="2.6" stroke-dasharray="7 4"/></svg>RCR boundary (outside = OCR)</span>`:''}${nulls?`<span class="k"><svg width="14" height="12"><rect width="14" height="12" fill="url(#hatch)" stroke="${css('--border')}"/></svg>no data (${nulls})</span>`:''}${V.d?`<span class="k"><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="${css('--ink')}" fill-opacity=".62"/></svg>projects in the open district, sized by transactions</span>`:''}`;
+}
+function tipPos(e, html){ const t=$('tip'); const box=$('mapbox').getBoundingClientRect(); t.innerHTML=html; t.style.display='block';
+  let x=e.clientX-box.left+14, y=e.clientY-box.top+14; const w=t.offsetWidth, h=t.offsetHeight; if(x+w>box.width) x=e.clientX-box.left-w-14; if(y+h>box.height) y=Math.max(0,e.clientY-box.top-h-14); t.style.left=x+'px'; t.style.top=y+'px'; }
+function showTip(e,k){ const d=+k; const s=SUM_D[d]; const rm=RM[S.metric]; const v=districtMetric(S.metric,d);
+  tipPos(e, `<b>D${k}</b> · ${esc(M.names[k]||'')}<br>${esc(rm.label)}: <b>${rm.fmt(v)}</b><br>${S.metric!=='psf'?`${esc(RM.psf.label)}: ${fmtPsf(pick(s,'PSF'))}<br>`:''}${S.metric!=='price'?`${esc(RM.price.label)}: ${fmtMoney(pick(s,'PRICE'))}<br>`:''}<span style="color:var(--ink-soft)">${s.n?nContext(s.n)+' in range':'no transactions under these filters'}</span>`); }
+function showTipProject(e,pi,n){ const P=D.projects[pi]; tipPos(e, `<b>${esc(P[0])}</b><br><span style="color:var(--ink-soft)">${esc(P[1])}</span><br>${fmtN(n)} tx under current filters<br><span style="color:var(--ink-soft)">click to open</span>`); }
+function hideTip(){ $('tip').style.display='none'; }
+
+// ======================= detail panel =======================
+function openDistrict(d){ zoomOn=true; V.level='district'; V.d=d; V.p=null; V.search=''; renderMap(); renderDetail(); renderCompare(); scrollDetail(); }
+function openProject(pi){ V.level='project'; V.p=pi; V.d=D.projects[pi][2]; renderMap(); renderDetail(); scrollDetail(); }
+function openSG(){ V.level='sg'; V.d=null; V.p=null; V.seg=null; renderMap(); renderDetail(); renderCompare(); }
+function openSeg(g){ V.level='seg'; V.seg=g; V.d=null; V.p=null; renderMap(); renderDetail(); }
+function scrollDetail(){ if(window.innerWidth<1060) $('detail').scrollIntoView({behavior:'smooth', block:'start'}); }
+
+function currentIdx(){
+  if(V.level==='district') return BY_D[V.d];
+  if(V.level==='seg') return BY_SEG[V.seg];
+  if(V.level==='project'){ const c=D.cols; return BY_D[V.d].filter(i=>c.p[i]===V.p); }
+  return ALL;
+}
+function renderDetail(){
+  if(!BY_D) return;
+  const idx=currentIdx(); const sum=summarize(idx);
+  const crumbs=[`<button onclick="openSG()">All Singapore</button>`];
+  let title='All Singapore', sub='';
+  if(V.level==='seg'){ title=`${D.dict.seg[V.seg]} · ${{0:'Core Central Region',1:'Rest of Central Region',2:'Outside Central Region'}[V.seg]}`; }
+  if(V.level==='district'||V.level==='project'){ const k=String(V.d).padStart(2,'0'); crumbs.push(`<button onclick="openDistrict(${V.d})">D${k}</button>`); title=`District ${k}`; sub=esc(M.names[k]||''); }
+  if(V.level==='project'){ const P=D.projects[V.p]; title=P[7]?`${esc(P[1])}`:esc(P[0]); sub = P[7]? 'Landed homes on this street (URA lists them without a project name)' : `${esc(P[1])} · ${D.dict.seg[P[3]]||''}`; crumbs.push(`<span>${esc(P[7]?P[1]:P[0])}</span>`); }
+  $('dTitle').innerHTML = title + `<span class="hint">${V.level==='sg'?'click a district on the map to drill in':''}</span>`;
+  $('crumbs').innerHTML = crumbs.join('<span class="sep">›</span>');
+  let h = sub?`<div class="sub2">${sub}</div>`:'';
+  if(!sum.n){ h += `<div class="empty">No transactions match the current filters here.<br>Widen the time range or relax a filter.</div>`; $('dBody').innerHTML=h + extrasHtml(); destroyChart(); return; }
+  h += miniStats(idx, sum);
+  h += `<div class="chartctrl"><select class="sel" id="cMetric" aria-label="Chart metric">${[['psf','$psf'],['price','Price'],['area','Area'],['lease','Remaining lease'],['volume','Transactions'],['band_psf','Spread: lowest–highest $psf'],['band_price','Spread: lowest–highest price']].map(([k,l])=>`<option value="${k}"${V.chartMetric===k?' selected':''}>${l}</option>`).join('')}</select>
+     <select class="sel" id="cBreak" aria-label="Chart breakdown">${[['none','No breakdown'],['ptype','by property type'],['sale','by type of sale'],['seg','by market segment'],['kind','by tenure']].map(([k,l])=>`<option value="${k}"${V.breakdown===k?' selected':''}>${l}</option>`).join('')}</select>
+     <span class="hint" id="cHint"></span></div>
+     <div class="chartbox"><canvas id="chartCanvas" role="img" aria-label="Chart over time"></canvas></div>
+     <button class="btn" id="ptToggle" style="margin-top:10px">${V.showPeriodTable?'Hide':'Show'} period table</button>
+     <div id="ptWrap" style="${V.showPeriodTable?'':'display:none'};margin-top:8px"></div>`;
+  if(V.level==='sg') h += segBench();
+  if(V.level==='district') h += projectList(idx);
+  if(V.level==='project') h += projectInfo() + txTable(idx);
+  h += extrasHtml();
+  $('dBody').innerHTML = h;
+  $('cMetric').onchange=e=>{V.chartMetric=e.target.value; drawChart(idx); drawPeriodTable(idx);};
+  $('cBreak').onchange=e=>{V.breakdown=e.target.value; drawChart(idx);};
+  $('ptToggle').onclick=()=>{ V.showPeriodTable=!V.showPeriodTable; $('ptWrap').style.display=V.showPeriodTable?'':'none'; $('ptToggle').textContent=(V.showPeriodTable?'Hide':'Show')+' period table'; };
+  drawChart(idx); drawPeriodTable(idx);
+  if(V.level==='district') wireProjectList(idx);
+  if(V.level==='project') wireTxTable(idx);
+}
+function miniStats(idx, sum){
+  let peers=null, peerName='';
+  if(V.level==='district'){ peers=d=>Array.from({length:28},(_,j)=>j+1).map(dd=>({k:dd, v:districtMetric(d,dd)})); peerName='districts'; }
+  if(V.level==='project'){ const c=D.cols; const byP=new Map(); for(const i of BY_D[V.d]){ const p=c.p[i]; let a=byP.get(p); if(!a){a=[];byP.set(p,a);} a.push(i); }
+    const cache={}; peers=key=>{ if(!cache[key]) cache[key]=[...byP.entries()].map(([p,ix])=>({k:p, v:RM[key].calc(ix, key.match(/^(price|psf|area|lease)$/)?summarize(ix):null)})); return cache[key]; }; peerName='projects in district'; }
+  const own = V.level==='district'?V.d:V.p;
+  const items = [['price'],['psf'],['area'],['lease'],['cagr_psf'],['cagr_price'],['tot_psf'],['tot_price'],['velocity']];
+  const g=growth(idx,'PSF');
+  let h='<div class="miniStats">';
+  items.forEach(([k])=>{ const rm=RM[k]; const v = rm.calc(idx, sum); const r = peers? rankAmong(peers(k), own):'';
+    const val = k==='area'? fmtAreaBoth(v) : rm.fmt(v);
+    h+=`<div class="m">${esc(rm.label)}<b>${val}</b>${r?`<span class="rankTag" title="Rank among ${peerName}, highest first">${r} ${peerName.split(' ')[0]}</span>`:''}</div>`; });
+  h+=`<div class="m">Transactions<b>${fmtN(sum.n)}</b>${sum.units!==sum.n?`<span class="rankTag">${fmtN(sum.units)} units</span>`:''}</div>`;
+  if(V.level==='sg'){ h+=`<div class="m">Avg velocity per district<b>${fmtVel(sum.n/rangeYears()/28)}</b></div>`; }
+  h+='</div>';
+  h+=`<div class="legend-note">${S.stat==='low'||S.stat==='high'?`${STAT_LABEL[S.stat]} = a single real transaction (${nContext(sum.n)}).`:`${STAT_LABEL[S.stat]} of ${fmtN(sum.n)} transactions in range.`} ${g.from?`Growth runs ${g.from} → ${g.to} (${g.yrs.toFixed(g.yrs%1?2:0)} yrs; first and last ${effGran()==='quarter'?'quarters':'years'} with ≥${MIN_N_GROWTH} tx), using the ${STAT_LABEL[S.stat].toLowerCase()} of each period.`:`Growth needs two ${effGran()==='quarter'?'quarters':'years'} with ≥${MIN_N_GROWTH} transactions each, at least ${MIN_YRS_GROWTH} year apart.`}</div>`;
+  return h;
+}
+function segBench(){
+  let h=`<div class="sectionh">Market segments <span class="hint">click to open · same filters</span></div><div class="list" style="max-height:none">`;
+  [0,1,2].forEach(g=>{ const idx=BY_SEG[g]; const s=summarize(idx);
+    h+=`<div class="row bench click" onclick="openSeg(${g})"><div class="top"><span class="nm">${D.dict.seg[g]} <small>${{0:'Core Central',1:'Rest of Central',2:'Outside Central'}[g]}</small></span><span class="v">${fmtPsf(pick(s,'PSF'))} psf · ${fmtMoney(pick(s,'PRICE'))}</span></div><div class="n">${fmtN(s.n)} tx · ${fmtVel(RM.velocity.calc(idx))}</div></div>`; });
+  return h+'</div>';
+}
+
+// ---------- chart ----------
+function destroyChart(){ if(chart){ chart.destroy(); chart=null; } }
+function seriesColours(){ return ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'].map(css); }
+function breakdownKey(i){ const c=D.cols;
+  switch(V.breakdown){ case 'ptype': return PTYPE_GROUPS[D.dict.ptype[c.t[i]]]||D.dict.ptype[c.t[i]]; case 'sale': return SALE_LABEL[c.s[i]];
+    case 'seg': return D.dict.seg[c.g[i]]; case 'kind': return KIND_LABEL[D.dict.kind[c.k[i]]]; default: return 'All'; } }
+const BREAK_ORDER = {ptype:['Apartment','Condominium','Executive condo','Strata landed','Landed'], sale:['New sale','Sub sale','Resale'], seg:['CCR','RCR','OCR'], kind:Object.values(KIND_LABEL)};
+function periodStats(rows, metric){
+  const c=D.cols; const n=rows.length; if(!n) return null;
+  if(metric==='volume') return {v:n, n};
+  const vals=[];
+  for(const i of rows){ if(metric==='price'||metric==='band_price') vals.push(c.pr[i]); else if(metric==='psf'||metric==='band_psf') vals.push(PSF[i]); else if(metric==='area') vals.push(AREA[i]); else if(metric==='lease'){ if(c.rl[i]>=0 && D.dict.kind[c.k[i]]==='LH') vals.push(c.rl[i]/10); } }
+  if(!vals.length) return null; const st=dstat(Float64Array.from(vals));
+  if(metric.startsWith('band')) return {lo:st.low, hi:st.high, med:st.median, n};
+  return {v:st[S.stat], n, nv:st.n};
+}
+function chartGran(idx){ return S.gran==='auto' && effGran()==='quarter' && idx.length < 150 ? 'year' : effGran(); }
+function drawChart(idx){
+  destroyChart(); if(typeof Chart==='undefined'){ $('cHint').textContent='Chart library failed to load.'; return; }
+  const g=chartGran(idx); const metric=V.chartMetric;
+  const periods=[]; if(g==='quarter'){ for(let q=S.q0;q<=S.q1;q++) periods.push(q); } else { for(let y=D.base_year+Math.floor(S.q0/4); y<=D.base_year+Math.floor(S.q1/4); y++) periods.push(y); }
+  const pIndex=new Map(periods.map((p,j)=>[p,j]));
+  const groups=new Map();
+  for(const i of idx){ const k=breakdownKey(i); let a=groups.get(k); if(!a){ a=periods.map(()=>[]); groups.set(k,a);} const j=pIndex.get(periodOf(i,g)); if(j!=null) a[j].push(i); }
+  let keys=[...groups.keys()]; const ord=BREAK_ORDER[V.breakdown]; if(ord) keys.sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));
+  const cols=seriesColours(); const labels=periods.map(p=>periodLabel(p,g)+(periodPartial(p,g)?'*':''));
+  const fm = {price:v=>fmtMoney(v), band_price:v=>fmtMoney(v), psf:fmtPsf, band_psf:fmtPsf, area:fmtArea, lease:fmtYrs, volume:fmtN}[metric];
+  const ticks = {price:v=>fmtMoney(v,true), band_price:v=>fmtMoney(v,true), psf:v=>'$'+Math.round(v).toLocaleString('en-SG'), band_psf:v=>'$'+Math.round(v).toLocaleString('en-SG'), area:v=>Math.round(v).toLocaleString('en-SG'), lease:v=>v+'y', volume:v=>v}[metric];
+  const datasets=[]; const meta=[];
+  if(metric.startsWith('band')){
+    // spread: single series (breakdown ignored) - literal min and max, median line
+    const rows=periods.map((_,j)=>{ const all=[]; groups.forEach(a=>all.push(...a[j])); return periodStats(all,metric); });
+    const c0=cols[0];
+    datasets.push({label:'Highest', data:rows.map(r=>r?r.hi:null), borderColor:c0, backgroundColor:c0+'33', fill:'+1', pointRadius:0, borderWidth:1.5, spanGaps:true});
+    datasets.push({label:'Lowest', data:rows.map(r=>r?r.lo:null), borderColor:c0, backgroundColor:c0+'33', fill:false, pointRadius:0, borderWidth:1.5, spanGaps:true});
+    datasets.push({label:'Median', data:rows.map(r=>r?r.med:null), borderColor:css('--ink-soft'), borderDash:[4,3], pointRadius:0, borderWidth:1.5, spanGaps:true, fill:false});
+    meta.push(rows.map(r=>r?r.n:0), rows.map(r=>r?r.n:0), rows.map(r=>r?r.n:0));
+    $('cHint').textContent='Always the literal lowest and highest transaction, whatever the Statistic toggle says. Breakdown ignored.';
+  } else {
+    if(keys.length>8){ keys=keys.slice(0,8); }
+    keys.forEach((k,si)=>{ const a=groups.get(k); const st=a.map(rows=>periodStats(rows,metric)); const colour=cols[si%8];
+      const ds = metric==='volume'
+        ? {label:k, data:st.map(s=>s?s.v:0), backgroundColor:colour, borderWidth:0, borderRadius:3, stack:'v', borderSkipped:'start'}
+        : {label:k, data:st.map(s=>s?s.v:null), borderColor:colour, backgroundColor:colour, borderWidth:2, pointRadius:periods.length>40?0:2.5, pointHoverRadius:5, tension:0.15, spanGaps:true};
+      datasets.push(ds); meta.push(st.map(s=>s?s.n:0)); });
+    $('cHint').textContent = (metric==='volume' ? 'Number of caveats (transactions) per period.' : `${STAT_LABEL[S.stat]} per period${V.breakdown!=='none'?', one line per group':''}. * = period only partly covered by the data or the range.`) + (g!==effGran()?' Yearly here because there are too few transactions for quarters.':'');
+  }
+  const ink=css('--ink-soft'), grid=css('--grid');
+  chart = new Chart($('chartCanvas'), { type: metric==='volume'?'bar':'line', data:{labels, datasets},
+    options:{ responsive:true, maintainAspectRatio:false, animation:false, interaction:{mode:'index', intersect:false},
+      plugins:{ legend:{display: datasets.length>1, labels:{color:ink, boxWidth:12, boxHeight:12, font:{size:11}}},
+        tooltip:{ callbacks:{ label:(ctx)=>{ const n=meta[ctx.datasetIndex][ctx.dataIndex]; const v=ctx.parsed.y; if(v==null) return null;
+          const nTxt = metric==='volume'?'':` (${(metric.startsWith('band')||S.stat==='low'||S.stat==='high')&&ctx.dataset.label!=='Median'? (ctx.dataset.label==='Lowest'||S.stat==='low'?'lowest':'highest')+' of '+fmtN(n)+' tx' : 'n='+fmtN(n)})`;
+          return `${ctx.dataset.label}: ${fm(v)}${nTxt}`; } } } },
+      scales:{ x:{ stacked: metric==='volume', ticks:{color:ink, maxRotation:0, autoSkip:true, font:{size:10.5}}, grid:{display:false}, border:{color:grid} },
+               y:{ stacked: metric==='volume', beginAtZero: metric==='volume', ticks:{color:ink, callback:ticks, font:{size:10.5}}, grid:{color:grid}, border:{display:false} } } } });
+}
+function drawPeriodTable(idx){
+  const g=chartGran(idx); const metric=V.chartMetric.startsWith('band')?'psf':V.chartMetric==='volume'?'psf':V.chartMetric;
+  const by=new Map(); for(const i of idx){ const p=periodOf(i,g); let a=by.get(p); if(!a){a=[];by.set(p,a);} a.push(i); }
+  const keys=[...by.keys()].sort((a,b)=>b-a);
+  let h=`<div class="tablewrap"><table class="dt"><thead><tr><th>Period</th><th>Tx</th><th>${STAT_LABEL[S.stat]} price</th><th>${STAT_LABEL[S.stat]} $psf</th><th>Lowest $psf</th><th>Highest $psf</th><th>${STAT_LABEL[S.stat]} area (sqft)</th><th>${STAT_LABEL[S.stat]} lease left</th></tr></thead><tbody>`;
+  keys.forEach(p=>{ const s=summarize(by.get(p)); h+=`<tr><td>${periodLabel(p,g)}${periodPartial(p,g)?'*':''}</td><td>${fmtN(s.n)}</td><td>${fmtMoney(pick(s,'PRICE'))}</td><td>${fmtPsf(pick(s,'PSF'))}</td><td>${fmtPsf(s.PSF&&s.PSF.low)}</td><td>${fmtPsf(s.PSF&&s.PSF.high)}</td><td>${fmtN(pick(s,'AREA'))}</td><td>${fmtYrs(pick(s,'LEASE'))}</td></tr>`; });
+  $('ptWrap').innerHTML = h+'</tbody></table></div>';
+}
+
+// ---------- district: project list ----------
+function projectList(idx){
+  const opts = ['psf','price','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','velocity'];
+  return `<div class="sectionh">Projects in this district <span style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><select class="sel" id="lMetric" aria-label="Rank projects by">${opts.map(k=>`<option value="${k}"${V.listMetric===k?' selected':''}>${esc(RM[k].label)}</option>`).join('')}</select><button class="btn" id="lSort">${V.listSort==='desc'?'High → low':'Low → high'}</button><select class="sel" id="lMin" aria-label="Minimum transactions">${[1,3,5,10,20].map(v=>`<option value="${v}"${V.minTx===v?' selected':''}>≥${v} tx</option>`).join('')}</select><input class="search" id="lSearch" placeholder="Search projects / streets" value="${esc(V.search)}"></span></div><div id="plist"></div>`;
+}
+function wireProjectList(idx){
+  const draw=()=>{
+    const c=D.cols; const byP=new Map(); for(const i of idx){ const p=c.p[i]; let a=byP.get(p); if(!a){a=[];byP.set(p,a);} a.push(i); }
+    const rm=RM[V.listMetric]; const q=V.search.trim().toUpperCase();
+    let rows=[...byP.entries()].map(([p,ix])=>{ const P=D.projects[p]; const s=summarize(ix); return {p, P, n:ix.length, v:rm.calc(ix,s)}; });
+    if(q) rows=rows.filter(r=>r.P[0].includes(q)||r.P[1].includes(q));
+    const hidden = rows.filter(r=>r.n<V.minTx).length; rows=rows.filter(r=>r.n>=V.minTx);
+    rows.sort((a,b)=> (a.v==null)-(b.v==null) || (V.listSort==='desc'? b.v-a.v : a.v-b.v) || b.n-a.n);
+    const vals=rows.map(r=>r.v).filter(v=>v!=null&&isFinite(v)); const lo=Math.min(...vals), hi=Math.max(...vals);
+    const pct=v=> v==null?0:Math.max(2,Math.min(100,Math.round(100*(v-lo)/((hi-lo)||1))));
+    const dsum=SUM_D[V.d]; const allSum=summarize(ALL);
+    let h=`<div class="list">`;
+    h+=`<div class="row bench click" onclick="openSG()"><div class="top"><span class="nm">All Singapore <small>benchmark</small></span><span class="v">${rm.fmt(rm.calc(ALL,allSum))}</span></div><div class="n">${fmtN(ALL.length)} tx</div></div>`;
+    h+=`<div class="row bench"><div class="top"><span class="nm">Whole district <small>benchmark</small></span><span class="v">${rm.fmt(rm.calc(idx,dsum))}</span></div><div class="n">${fmtN(idx.length)} tx · ${byP.size} projects/streets</div></div>`;
+    rows.slice(0,400).forEach(r=>{ const nm = r.P[7] ? `${esc(r.P[1])} <small>landed, unnamed</small>` : `${esc(r.P[0])} <small>${esc(r.P[1])}</small>`;
+      h+=`<div class="row" data-p="${r.p}"><div class="top"><span class="nm">${nm}</span><span class="v">${rm.fmt(r.v)}</span></div><div class="n">${fmtN(r.n)} tx</div><div class="bar"><i style="width:${pct(r.v)}%"></i></div></div>`; });
+    if(rows.length>400) h+=`<div class="empty">${rows.length-400} more – use the search box.</div>`;
+    if(!rows.length) h+=`<div class="empty">No projects match.</div>`;
+    if(hidden) h+=`<div class="empty" style="padding:10px">${hidden} projects/streets with fewer than ${V.minTx} transactions hidden.</div>`;
+    $('plist').innerHTML=h+'</div>';
+    [...$('plist').querySelectorAll('.row[data-p]')].forEach(e=>e.onclick=()=>openProject(+e.dataset.p));
+  };
+  $('lMetric').onchange=e=>{V.listMetric=e.target.value; draw();};
+  $('lSort').onclick=()=>{V.listSort=V.listSort==='desc'?'asc':'desc'; $('lSort').textContent=V.listSort==='desc'?'High → low':'Low → high'; draw();};
+  $('lMin').onchange=e=>{V.minTx=+e.target.value; draw();};
+  $('lSearch').oninput=debounce(e=>{V.search=e.target.value; draw();},200);
+  draw();
+}
+
+// ---------- project ----------
+function projectInfo(){
+  const P=D.projects[V.p]; const c=D.cols; const types=new Map(); let n=0, first=1e9, last=-1;
+  for(let i=0;i<N;i++){ if(c.p[i]!==V.p) continue; n++; types.set(D.dict.ptype[c.t[i]], (types.get(D.dict.ptype[c.t[i]])||0)+1); if(c.mi[i]<first) first=c.mi[i]; if(c.mi[i]>last) last=c.mi[i]; }
+  const mo = m=> new Date(D.base_year+Math.floor(m/12), m%12, 1).toLocaleDateString('en-SG',{month:'short',year:'numeric'});
+  const loc = {ura:'URA coordinates', 'ura-other':'URA (rental / developer data)', 'onemap-project':'OneMap lookup', 'onemap-street':'OneMap (street centre)', none:'not located'}[D.dict.loc[P[6]]];
+  return `<div class="sectionh">About</div><dl class="kv"><dt>Tenure</dt><dd>${esc(P[8]||'—')}</dd><dt>Property types</dt><dd>${[...types.entries()].map(([k,v])=>`${esc(k)} (${v})`).join(', ')}</dd><dt>District · segment</dt><dd>D${String(P[2]).padStart(2,'0')} · ${D.dict.seg[P[3]]||'—'}</dd><dt>In archive</dt><dd>${fmtN(n)} transactions, ${mo(first)} – ${mo(last)} (all, unfiltered)</dd><dt>Map location</dt><dd>${loc}</dd></dl>`;
+}
+function txTable(idx){
+  return `<div class="sectionh">Transactions <span class="hint">matching the filters · click a column to sort</span></div><div class="tablewrap" style="max-height:420px"><table class="dt" id="txT"></table></div>`;
+}
+function wireTxTable(idx){
+  const c=D.cols;
+  const colsDef=[['mi','Month',i=>new Date(D.base_year+Math.floor(c.mi[i]/12), c.mi[i]%12,1).toLocaleDateString('en-SG',{month:'short',year:'numeric'}), i=>c.mi[i]],
+    ['t','Type',i=>esc(D.dict.ptype[c.t[i]]), i=>c.t[i]], ['s','Sale',i=>SALE_LABEL[c.s[i]], i=>c.s[i]], ['f','Floor',i=>esc(D.dict.floor[c.f[i]]), i=>c.f[i]],
+    ['a','Area sqft',i=>fmtN(AREA[i]), i=>AREA[i]], ['am','sqm',i=>(c.a[i]/10).toLocaleString('en-SG'), i=>c.a[i]],
+    ['pr','Price',i=>fmtMoney(c.pr[i]), i=>c.pr[i]], ['ps','$psf',i=>fmtPsf(PSF[i]), i=>PSF[i]],
+    ['rl','Lease left',i=> c.rl[i]>=0 && D.dict.kind[c.k[i]]==='LH' ? (c.rl[i]/10).toFixed(1)+' yrs' : esc(KIND_LABEL[D.dict.kind[c.k[i]]].split(' ')[0]), i=>D.dict.kind[c.k[i]]==='LH'?c.rl[i]:99999],
+    ['u','Units',i=>c.u[i], i=>c.u[i]]];
+  const draw=()=>{ const d=colsDef.find(x=>x[0]===V.txSort.k); const rows=[...idx].sort((a,b)=>(d[3](a)-d[3](b))*V.txSort.dir);
+    let h=`<thead><tr>${colsDef.map(x=>`<th data-k="${x[0]}">${x[1]}${V.txSort.k===x[0]?(V.txSort.dir<0?' ▾':' ▴'):''}</th>`).join('')}</tr></thead><tbody>`;
+    rows.slice(0,1000).forEach(i=>{ h+=`<tr>${colsDef.map(x=>`<td>${x[2](i)}</td>`).join('')}</tr>`; });
+    if(rows.length>1000) h+=`<tr><td colspan="${colsDef.length}" class="l">Showing 1,000 of ${fmtN(rows.length)}.</td></tr>`;
+    $('txT').innerHTML=h+'</tbody>';
+    [...$('txT').querySelectorAll('th')].forEach(th=>th.onclick=()=>{ const k=th.dataset.k; V.txSort = V.txSort.k===k?{k,dir:-V.txSort.dir}:{k,dir:-1}; draw(); }); };
+  draw();
+}
+
+// ---------- rentals / developer sales / pipeline ----------
+function extrasHtml(){
+  let h='';
+  if(V.level==='project'){
+    const X=D.extras[String(V.p)]; if(!X) return '';
+    if(X.rent){ const last=X.rent[X.rent.length-1]; const yr = rentalYield(V.p, last[0]);
+      h+=`<div class="xbox"><h4>Rental (URA median rents, non-landed)</h4><p>Latest: <b>${last[0]}</b> · median <b>$${last[1].toFixed(2)} psf/month</b> (middle half $${last[2].toFixed(2)}–$${last[3].toFixed(2)})${yr?` · implied gross yield <b>${yr.toFixed(1)}%</b> <span class="hint">(median rent × 12 ÷ median resale $psf around that quarter, unfiltered)</span>`:''}</p><p>${X.rent.slice(-8).map(r=>`${r[0]}: $${r[1].toFixed(2)}`).join(' · ')}</p></div>`; }
+    if(X.dev){ const d=X.dev; const pct=d.launchedToDate?100*d.soldToDate/d.launchedToDate:null; const lm=d.m[d.m.length-1];
+      h+=`<div class="xbox"><h4>Developer sales (URA)</h4><p>${esc(d.developer)} · as of ${lm}: <b>${fmtN(d.units)}</b> units in project, <b>${fmtN(d.launchedToDate)}</b> launched, <b>${fmtN(d.soldToDate)}</b> sold${pct!=null?` (${pct.toFixed(0)}% of launched)`:''}, <b>${fmtN(d.launchedToDate-d.soldToDate)}</b> launched but unsold, <b>${fmtN(d.units-d.launchedToDate)}</b> not yet launched.</p><p>Units sold, last 6 months: ${d.m.slice(-6).map((m,j)=>{ const k=d.m.length-6+j; return `${m}: ${d.sold[k]}${d.med[k]?` @ $${d.med[k].toLocaleString('en-SG')} psf median`:''}`; }).join(' · ')}</p></div>`; }
+    if(X.pipe){ h+=`<div class="xbox"><h4>In URA's pipeline</h4><p>${fmtN(X.pipe.units)} units · expected TOP ${esc(X.pipe.top==='na'?'not disclosed':X.pipe.top)} · ${esc(X.pipe.developer)}</p></div>`; }
+  }
+  if(V.level==='district'){ const k=String(V.d).padStart(2,'0'); const pp=D.pipeline_by_district[k];
+    let unsold=0, unl=0, nd=0; for(const [pi,X] of Object.entries(D.extras)){ if(!X.dev) continue; if(D.projects[+pi][2]!==V.d) continue; if(X.dev.m[X.dev.m.length-1]!==D.meta.dev_latest_month) continue; nd++; unsold+=X.dev.launchedToDate-X.dev.soldToDate; unl+=X.dev.units-X.dev.launchedToDate; }
+    if(pp||nd){ h+=`<div class="xbox"><h4>Supply in this district (URA)</h4>`;
+      if(nd) h+=`<p>Developer stock as of ${D.meta.dev_latest_month}: <b>${fmtN(unsold)}</b> launched-but-unsold units and <b>${fmtN(unl)}</b> not-yet-launched units across ${nd} projects.</p>`;
+      if(pp) h+=`<p>Pipeline (latest quarter): <b>${fmtN(pp.units)}</b> units in ${pp.projects} projects – ${pp.list.slice(0,8).map(r=>`${esc(r[0])} (${fmtN(r[2])}${r[3]&&r[3]!=='na'?', TOP '+esc(r[3]):''})`).join(', ')}${pp.list.length>8?'…':''}</p>`;
+      h+='</div>'; } }
+  return h;
+}
+function rentalYield(pi, rq){ // rq like '2026Q2'
+  const X=D.extras[String(pi)]; const r=X.rent.find(x=>x[0]===rq); if(!r) return null;
+  const y=+rq.slice(0,4), q=+rq.slice(5)-1; const qa=(y-D.base_year)*4+q; const c=D.cols;
+  let vals=[]; for(let w=0; w<=2 && vals.length<3; w++){ vals=[]; for(let i=0;i<N;i++){ if(c.p[i]!==pi||c.s[i]!==3||c.u[i]>1) continue; if(Math.abs(QA[i]-qa)<=w) vals.push(PSF[i]); } }
+  if(vals.length<3) return null; const st=dstat(Float64Array.from(vals)); return r[1]*12/st.median*100;
+}
+
+// ======================= compare table =======================
+function renderCompare(){
+  if(!BY_D) return;
+  const cols=[['d','District'],['name','Area'],['n','Tx'],['velocity','Velocity'],['price',RM.price.label],['psf',RM.psf.label],['area',RM.area.label+' (sqft)'],['lease',RM.lease.label],['cagr_psf','CAGR $psf'],['cagr_price','CAGR price'],['tot_psf','Growth $psf'],['tot_price','Growth price']];
+  const rowFor=(label, name, idx, sum, extra)=>({label, name, idx, sum, ...extra, n:idx.length, vals:Object.fromEntries(MAP_METRICS.map(k=>[k, RM[k].calc(idx,sum)]))});
+  const bench=[rowFor('All Singapore','',ALL,summarize(ALL),{bench:true, act:'openSG()'})];
+  [0,1,2].forEach(g=>bench.push(rowFor(D.dict.seg[g], {0:'Core Central Region',1:'Rest of Central Region',2:'Outside Central Region'}[g], BY_SEG[g], summarize(BY_SEG[g]), {bench:true, act:`openSeg(${g})`})));
+  const rows=[]; for(let d=1; d<=28; d++){ const k=String(d).padStart(2,'0'); rows.push({...rowFor('D'+k, M.names[k]||'', BY_D[d], SUM_D[d], {d, act:`openDistrict(${d})`}), vals:Object.fromEntries(MAP_METRICS.map(m=>[m, districtMetric(m,d)]))}); }
+  const val=(r,k)=> k==='d'?r.d : k==='name'?r.name : k==='n'?r.n : r.vals[k];
+  rows.sort((a,b)=>{ const va=val(a,cmpSort.k), vb=val(b,cmpSort.k); if(va==null&&vb==null) return 0; if(va==null) return 1; if(vb==null) return -1; return (typeof va==='string'? va.localeCompare(vb) : va-vb)*cmpSort.dir; });
+  const cell=(r,k)=> k==='d'?esc(r.label) : k==='name'?esc(r.name) : k==='n'?fmtN(r.n) : k==='area'? fmtN(r.vals.area) : RM[k].fmt(r.vals[k]);
+  let h=`<thead><tr>${cols.map(([k,l])=>`<th data-k="${k}">${esc(l)}${cmpSort.k===k?(cmpSort.dir<0?' ▾':' ▴'):''}</th>`).join('')}</tr></thead><tbody>`;
+  [...bench, ...rows].forEach(r=>{ h+=`<tr class="click${r.bench?' bench':''}" onclick="${r.act}"${r.d===V.d?' style="outline:2px solid var(--accent)"':''}>${cols.map(([k],j)=>`<td${j<2?' class="l"':''}>${cell(r,k)}</td>`).join('')}</tr>`; });
+  const T=$('cmpTable'); T.innerHTML=h+'</tbody>';
+  [...T.querySelectorAll('th')].forEach(th=>th.onclick=()=>{ const k=th.dataset.k; cmpSort = cmpSort.k===k?{k,dir:-cmpSort.dir}:{k,dir:(k==='d'||k==='name')?1:-1}; renderCompare(); });
+}
+
+// ======================= footnote =======================
+function footnote(){
+  const m=D.meta;
+  return `<p><b>Source.</b> URA Private Residential Property Transactions, Median Rentals, Developer Sales and Pipeline (URA Data Service), pulled daily by GitHub Actions. Last pull ${esc(m.pulled_at)}; page built ${esc(m.built_at.replace('T',' ').replace('+00:00',''))} UTC. URA publishes transactions on Tuesdays and Fridays, rentals quarterly, developer sales on the 15th, and the pipeline quarterly.</p>
+  <p><b>History.</b> URA serves only the latest 5 years of transactions (3 years of rentals and developer sales). Every pull is merged into a permanent archive on this repository's <code>raw-data</code> branch: the months URA still serves are replaced by the newest copy (URA revises and withdraws recent records), and older months are kept. The archive currently starts ${esc(m.earliest)}.</p>
+  <p><b>Definitions.</b> Price is the caveated price, or URA's nett price where a developer discount applies. $psf = price ÷ (area in sqm × 10.7639); area is strata floor area for apartments, condos and ECs, and land area for landed homes, so the two $psf figures are not comparable. Dates are contract months: option date for new sales, option-exercise date for resales and sub sales; recent months fill in as caveats are lodged. Remaining lease = lease start + lease length − transaction date (leasehold only; "99 years leasehold" rows without a start year borrow their project's start year). CAGR = (last ÷ first)^(1/years) − 1 between the first and last period in range with ≥${MIN_N_GROWTH} transactions; total growth is the same ratio, not annualised. Velocity = transactions ÷ years of data in range. Lowest/highest are single real transactions; median/mean are computed exactly from every matching transaction.</p>
+  <p><b>Matching.</b> Rentals, developer sales and pipeline are linked to transaction projects by name and district (${m.rent_matched??0}/${m.rent_projects??0} rental projects, ${m.dev_matched??0}/${m.dev_projects??0} developer-sales projects, ${m.pipe_matched??0}/${m.pipe_projects??0} pipeline rows). ${Math.round((m.located_tx_share||0)*100)}% of transactions belong to a project with known coordinates (URA's own, or OneMap); this only affects project dots and the drawn district shapes – every figure uses URA's own postal district.</p>`;
+}
+</script>
+</body>
+</html>
