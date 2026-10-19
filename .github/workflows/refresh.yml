@@ -43,7 +43,7 @@ jobs:
       - name: Fetch from URA
         env:
           URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
-        run: python pipeline/fetch.py
+        run: python pipeline/fetch.py 2>&1 | tee /tmp/fetch.log; s=${PIPESTATUS[0]}; [ $s -eq 0 ] || echo "::error title=fetch failed::$(tail -3 /tmp/fetch.log | tr '\\n' ' ')"; exit $s
 
       - name: Merge into permanent archive
         run: |
@@ -61,10 +61,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --cached --quiet; then echo "Store unchanged."; else
-            git commit -q -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push origin raw-data
+          if git diff --cached --quiet; then echo "Store unchanged."; exit 0; fi
+          git commit -q -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+          if ! out=$(git push origin HEAD:raw-data 2>&1); then
+            echo "::error title=push failed::$(echo "$out" | tail -5 | tr '\n' ' ')"; exit 1
           fi
+          echo "$out"
 
       - name: Build dashboard
         if: hashFiles('pipeline/build.py') != ''
