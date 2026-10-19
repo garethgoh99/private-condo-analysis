@@ -7,14 +7,16 @@ How the dashboard answers each question, and the limits of the data behind it.
 - **Same project (default).** A repeat-sales index. The repeat unit is a *project's size band*: project × bedroom band for apartments, condos and ECs, and project × property type for landed homes. For every unit, each pair of consecutive periods in which it traded gives a log change in its median $psf (or price). One log level per period is then fitted to all those changes by weighted least squares (Bailey–Muth–Nourse), with weights √min(n₁, n₂) and changes clipped at ±0.7. A tiny smoothness penalty only bridges periods that no unit connects. A wave of new launches, or a shift in which projects sell, therefore doesn't show up as growth. This method always uses medians.
 - **All transactions.** The chosen statistic (median, mean, lowest or highest) of everything that sold in the first period versus the last.
 - **Both methods:** CAGR = (last ÷ first)^(1/years) − 1, with the two anchor periods at least 1 year apart. Total growth is the same ratio, not annualised. Periods only partly covered by the data (such as the current quarter) aren't used as anchors unless nothing else is available.
-- **Why it matters (Oct 2021 – Q3 2026, 3-bed band, non-landed):**
+- **Why it matters.** CAGR of $psf from 2021 Q4 to 2026 Q3, as computed by the dashboard on the archive as of 19 Oct 2026:
 
-  | Method | CCR | RCR | OCR |
-  |---|---|---|---|
-  | Same project | 2.4% | 4.0% | 4.3% |
-  | All transactions (same-quarter anchors) | 0.6% | 6.5% | 6.0% |
+  | Selection | Method | CCR | RCR | OCR |
+  |---|---|---|---|---|
+  | All private homes | Same project | 2.1% | 4.0% | 5.4% |
+  | All private homes | All transactions | 2.0% | 3.7% | 6.5% |
+  | 3-bed band, non-landed | Same project | 2.4% | 3.8% | 5.2% |
+  | 3-bed band, non-landed | All transactions | 4.8% | 4.9% | 7.3% |
 
-  The all-transactions figures were checked with the incomplete-quarter anchors excluded. The gap between the methods comes from the mix of what sold.
+  Counting every transaction overstates growth wherever new launches, which are pricier per sq ft, make up a growing share of sales.
 - **$psf versus price.** $psf is the cleaner like-for-like measure. Price growth within a band can also reflect bigger or smaller units selling.
 
 ## Lease stage ("Lease stage" tab)
