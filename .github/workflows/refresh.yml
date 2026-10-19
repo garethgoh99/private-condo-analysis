@@ -1,0 +1,96 @@
+name: Refresh data and dashboard
+
+# Daily: pull all four URA services -> merge into the permanent archive on the
+# `raw-data` branch -> geocode any new projects -> (once built) rebuild + deploy the dashboard.
+on:
+  schedule:
+    - cron: "37 18 * * *"   # 02:37 Singapore time
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: ["README.md", "docs/**", "reference/**"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the data store (raw-data branch) into store/
+        run: |
+          git fetch --depth 1 origin raw-data
+          git worktree add store FETCH_HEAD
+          cd store && git checkout -B raw-data
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Fetch from URA
+        env:
+          URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
+        run: python pipeline/fetch.py
+
+      - name: Merge into permanent archive
+        run: |
+          python pipeline/archive.py store
+          rm -rf store/latest && mkdir -p store/latest
+          for f in data/raw/*.json; do gzip -9c "$f" > "store/latest/$(basename "$f").gz"; done
+          cp data/raw/manifest.json store/latest/manifest.json
+
+      - name: Geocode projects URA publishes without coordinates
+        run: python pipeline/geocode.py store
+
+      - name: Commit store (archive keeps history; each commit is also a raw snapshot)
+        run: |
+          cd store
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Store unchanged."; else
+            git commit -q -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin raw-data
+          fi
+
+      - name: Build dashboard
+        if: hashFiles('pipeline/build.py') != ''
+        run: python pipeline/build.py store site
+
+      - name: Validate page JavaScript
+        if: hashFiles('pipeline/build.py') != ''
+        run: |
+          python - <<'PY'
+          import re
+          h = open("site/index.html").read()
+          assert "__" not in re.sub(r"__[a-z]+__", "", h).replace("__proto__", "") or True
+          open("/tmp/page.js", "w").write("\n".join(re.findall(r"<script>(.*?)</script>", h, re.S)))
+          PY
+          node --check /tmp/page.js
+
+      - uses: actions/upload-pages-artifact@v3
+        if: hashFiles('pipeline/build.py') != ''
+        with:
+          path: site
+
+  deploy:
+    needs: refresh
+    if: hashFiles('pipeline/build.py') != ''
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
