@@ -65,6 +65,7 @@ def extras(store, projects):
 
     out = {}
     stats = {}
+    rent_rows = []
     rp = os.path.join(a, "rentals.csv.gz")
     if os.path.exists(rp):
         r = pd.read_csv(rp, dtype=str, keep_default_na=False)
@@ -76,6 +77,9 @@ def extras(store, projects):
                 continue
             hit += 1
             g = g.sort_values("refPeriod")
+            for q, m, p25, p75 in zip(g["refPeriod"], g["median"], g["psf25"], g["psf75"]):
+                y, qq = int(q[:4]), int(q[-1])
+                rent_rows.append([int(i), (y - 1990) * 4 + qq - 1, float(m), float(p25), float(p75)])
             out.setdefault(int(i), {})["rent"] = [[q, float(m), float(p25), float(p75)] for q, m, p25, p75 in
                                                   zip(g["refPeriod"], g["median"], g["psf25"], g["psf75"])]
         stats["rent_projects"] = int(r.groupby(["project", "district"]).ngroups)
@@ -124,6 +128,7 @@ def extras(store, projects):
         stats["pipe_projects"] = len(p)
         stats["pipe_matched"] = hit
         stats["pipe_release"] = p["release"].max() if len(p) else None
+    stats["_rent_rows"] = rent_rows
     return out, pipe_d, stats
 
 
@@ -147,6 +152,39 @@ def main(store, site):
                       sx, sy, LOC_SRC.index(r.loc_src) if r.loc_src in LOC_SRC else 4,
                       1 if r.project in GENERIC else 0])
 
+    # tenure text per project (most common) for the project panel
+    ten = tx.groupby("pkey")["tenure_raw"].agg(lambda s: s.value_counts().index[0])
+    for i, k in enumerate(projects["pkey"]):
+        plist[i].append(ten.get(k, ""))
+    # ---- harmonised floor-area flag per project (0 no, 1 likely by rule, 2 confirmed) ----
+    hcfg = json.load(open(os.path.join(ROOT, "data", "harmonisation.json")))
+    conf = {norm_name(c["project"]) for c in hcfg.get("confirmed", [])}
+    force_y = {norm_name(x) for x in hcfg.get("force_harmonised", [])}
+    force_n = {norm_name(x) for x in hcfg.get("force_not_harmonised", [])}
+    rule = hcfg.get("rule", {})
+    ns = tx[tx["sale"] == 1].groupby("pkey").agg(first_new=("month", "min"))
+    pl = tx.groupby("pkey").agg(ls=("lease_start", "max"), kind=("tenure_kind", lambda s: s.mode().iat[0]),
+                                pt=("ptype", lambda s: s.mode().iat[0]))
+    pl = pl.join(ns)
+    harm = {}
+    for k, r in pl.iterrows():
+        nn = norm_name(k.split("|")[0])
+        f = 0
+        if (r["kind"] == "LH" and pd.notna(r["ls"]) and r["ls"] >= rule.get("min_lease_start", 2023)
+                and isinstance(r["first_new"], str) and r["first_new"] >= rule.get("min_first_new_sale", "2024-03")):
+            f = 1
+        if nn in conf:
+            f = 2
+        if nn in force_y:
+            f = 2
+        if nn in force_n:
+            f = 0
+        harm[k] = f
+    for i, k in enumerate(projects["pkey"]):
+        r = pl.loc[k]
+        plist[i] += [ptypes.index(r["pt"]) if r["pt"] in ptypes else -1,
+                     int(r["ls"]) if pd.notna(r["ls"]) else 0, harm.get(k, 0)]
+
     tx = tx.sort_values(["mi", "district"], kind="stable").reset_index(drop=True)
     cols = {
         "mi": tx["mi"].astype(int).tolist(),
@@ -162,13 +200,11 @@ def main(store, site):
         "rl": (tx["rem_lease"] * 10).round().fillna(-1).astype(int).tolist(),
         "u": tx["units"].astype(int).tolist(),
         "ar": (tx["area_type"] == "Land").astype(int).tolist(),
+        "ls": tx["lease_start"].fillna(0).astype(int).tolist(),
     }
-    # tenure text per project (most common) for the project panel
-    ten = tx.groupby("pkey")["tenure_raw"].agg(lambda s: s.value_counts().index[0])
-    for i, k in enumerate(projects["pkey"]):
-        plist[i].append(ten.get(k, ""))
 
     ex, pipe_d, xstats = extras(store, projects)
+    rent_rows = xstats.pop("_rent_rows", [])
 
     manifest = {}
     mp = os.path.join(store, "latest", "manifest.json")
@@ -192,7 +228,11 @@ def main(store, site):
         "meta": meta, "base_year": 1990,
         "dict": {"ptype": ptypes, "floor": floors, "seg": SEGS, "kind": KINDS, "loc": LOC_SRC},
         "projects": plist, "cols": cols, "extras": {str(k): v for k, v in ex.items()},
-        "pipeline_by_district": pipe_d,
+        "pipeline_by_district": pipe_d, "rent": rent_rows,
+        "harmonisation": {"rule": hcfg.get("rule", {}).get("description", ""),
+                          "confirmed": [c["project"] for c in hcfg.get("confirmed", [])],
+                          "n_likely": sum(1 for v in harm.values() if v == 1),
+                          "n_confirmed": sum(1 for v in harm.values() if v == 2)},
     }
     with open(os.path.join(site, "data", "tx.json"), "w") as f:
         json.dump(data, f, separators=(",", ":"))

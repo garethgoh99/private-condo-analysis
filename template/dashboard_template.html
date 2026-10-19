@@ -171,6 +171,27 @@ table.dt td.l{text-align:left;}
 .note p{margin:0 0 6px;}
 #loading{padding:60px 20px; text-align:center; color:var(--ink-soft);}
 ::-webkit-scrollbar{width:8px; height:8px;} ::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
+/* v2 additions */
+.tabs{display:flex; gap:4px; flex-wrap:wrap; border-bottom:1px solid var(--border); margin:18px 0 10px;}
+.tab{font-size:12px; padding:7px 11px; cursor:pointer; color:var(--ink-soft); border:1px solid transparent; border-bottom:none; border-radius:5px 5px 0 0; background:none; font-family:inherit; margin-bottom:-1px;}
+.tab.on{color:var(--ink); background:var(--panel); border-color:var(--border); font-weight:600;}
+.insight-note{font-size:11px; color:var(--ink-soft); line-height:1.55; margin:6px 0 10px;}
+.minibar{display:inline-block; height:7px; border-radius:2px; vertical-align:middle; margin-left:6px;}
+.pinBtn{font-size:11.5px; border:1px solid var(--accent-2); color:var(--accent-2); background:none; border-radius:5px; padding:4px 10px; cursor:pointer; font-family:inherit; white-space:nowrap;}
+.pinBtn.on{background:var(--accent-2); color:var(--on-accent);}
+.pinMini{font-size:11px; border:none; background:none; color:var(--ink-mute); cursor:pointer; padding:0 2px; font-family:inherit;}
+.pinMini.on{color:var(--accent-2); font-weight:700;}
+.chips{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 10px;}
+.chip{display:inline-flex; align-items:center; gap:6px; font-size:12px; border:1px solid var(--border); border-radius:14px; padding:3px 6px 3px 9px; background:var(--panel-2);}
+.chip i{width:10px; height:10px; border-radius:50%; display:inline-block;}
+.chip button{background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:13px; line-height:1; padding:0 3px;}
+td.best{font-weight:700; color:var(--accent);}
+.bandEdit{display:none; margin-top:8px;}
+.bandEdit.show{display:block;}
+.bandEdit .numpair input{width:70px;}
+.harmTag{display:inline-block; font-size:9.5px; padding:0 5px; border-radius:7px; border:1px solid var(--accent-2); color:var(--accent-2); margin-left:4px; vertical-align:1px; font-weight:600;}
+#pinWrap{margin-top:16px;}
+.pinchart{height:320px; position:relative;}
 </style>
 </head>
 <body>
@@ -178,7 +199,7 @@ table.dt td.l{text-align:left;}
   <header class="top">
     <div>
       <h1>Private Residential Explorer</h1>
-      <div class="sub">Every URA-caveated private home sale in Singapore, __EARLIEST_MONTH__ – __LATEST_MONTH__, by postal district and project. Condos, apartments, ECs and landed. History keeps growing: every daily pull is merged into a permanent archive, so nothing drops off when URA's 5-year window moves on.</div>
+      <div class="sub">Every URA-caveated private home sale in Singapore, __EARLIEST_MONTH__ – __LATEST_MONTH__, by postal district and project: condos, apartments, ECs and landed homes. The history keeps growing, because each daily pull is merged into a permanent archive.</div>
     </div>
     <div class="statbar">
       <div class="stat"><b>__TOTAL_TX__</b>transactions archived</div>
@@ -204,21 +225,30 @@ table.dt td.l{text-align:left;}
       <div class="fbox"><div class="lbl"><span>Property type</span></div>
         <div class="pills" id="fPtype"></div>
         <div class="pills" id="fPtypeQuick" style="margin-top:6px"></div></div>
+      <div class="fbox"><div class="lbl"><span>Unit size ≈ bedrooms</span><button class="pinMini" id="bandEditBtn">edit sizes</button></div>
+        <div class="pills" id="fBand"></div>
+        <div class="bandEdit" id="bandEdit"><div class="legend-note" style="margin:0 0 6px">Cut-offs in sq ft (between studio/1, 2, 3, 4 and 5+ bedrooms):</div>
+          <div class="numpair"><input type="number" id="cut0" step="10"><input type="number" id="cut1" step="10"><input type="number" id="cut2" step="10"><input type="number" id="cut3" step="10"></div></div>
+        <div class="legend-note" style="margin-top:6px">URA doesn't record bedrooms, so these are size bands that match typical layouts. They apply to apartments, condos and ECs; picking a subset hides landed homes. Older condos are larger for the same bedroom count.</div></div>
       <div class="fbox"><div class="lbl"><span>Type of sale</span></div><div class="pills" id="fSale"></div>
         <div class="lbl" style="margin-top:12px"><span>Market segment</span></div><div class="pills" id="fSeg"></div></div>
       <div class="fbox"><div class="lbl"><span>Tenure</span></div><div class="pills" id="fKind"></div>
-        <div class="lbl" style="margin-top:12px"><span>Remaining lease (leasehold only)</span><b id="leaseLbl"></b></div>
+        <div class="lbl" style="margin-top:12px"><span>Remaining lease at sale (leasehold only)</span><b id="leaseLbl"></b></div>
         <div class="rangewrap"><input type="range" id="leaseLo" aria-label="Minimum remaining lease"><input type="range" id="leaseHi" aria-label="Maximum remaining lease"></div></div>
       <div class="fbox"><div class="lbl"><span>Floor range</span><b id="floorLbl"></b></div>
         <div class="rangewrap"><input type="range" id="floorLo" aria-label="Lowest floor band"><input type="range" id="floorHi" aria-label="Highest floor band"></div>
         <label class="chk"><input type="checkbox" id="floorNone" checked> Include homes with no floor band (landed)</label></div>
+      <div class="fbox"><div class="lbl"><span>Floor-area basis</span></div><div class="pills" id="fHarm"></div>
+        <div class="lbl" style="margin-top:10px"><span>Gross up harmonised areas by</span><b id="adjLbl"></b></div>
+        <div class="numpair"><input type="number" id="harmAdj" min="0" max="20" step="0.5" placeholder="0" aria-label="Gross-up percentage"><span>%</span></div>
+        <div class="legend-note" style="margin-top:6px">Launches approved under URA's 2023 rules list smaller areas for the same space (voids and air-con ledges excluded), so their $psf looks higher. Industry estimates put the difference at about 4–5%. Off by default.</div></div>
       <div class="fbox"><div class="lbl"><span>Units in the transaction</span></div><div class="pills" id="fUnits"></div>
-        <div class="legend-note" style="margin-top:6px">Bulk caveats (en-bloc / multi-unit) record the lot's total price and total area, so they distort price figures; $psf stays valid.</div></div>
+        <div class="legend-note" style="margin-top:6px">Bulk caveats (en-bloc or multi-unit) record the lot's total price and area, which distorts prices; their $psf is still valid.</div></div>
       <div class="fbox"><div class="lbl"><span>Transacted price (S$)</span></div>
         <div class="numpair"><input type="number" id="prMin" placeholder="min" min="0" step="10000"><span>–</span><input type="number" id="prMax" placeholder="max" min="0" step="10000"></div>
         <div class="lbl" style="margin-top:10px"><span>Price per sq ft (S$ psf)</span></div>
         <div class="numpair"><input type="number" id="psfMin" placeholder="min" min="0" step="50"><span>–</span><input type="number" id="psfMax" placeholder="max" min="0" step="50"></div></div>
-      <div class="fbox"><div class="lbl"><span>Area (sq ft)</span><span class="hint">floor area for strata, land area for landed</span></div>
+      <div class="fbox"><div class="lbl"><span>Area (sq ft)</span><span class="hint">floor area (strata) · land area (landed)</span></div>
         <div class="numpair"><input type="number" id="arMin" placeholder="min" min="0" step="50"><span>–</span><input type="number" id="arMax" placeholder="max" min="0" step="50"></div></div>
     </div>
   </div>
@@ -228,6 +258,7 @@ table.dt td.l{text-align:left;}
       <h2>Singapore by postal district <span class="hint">click a district · hover for figures</span></h2>
       <div class="ctrlrow">
         <div class="fbox"><div class="lbl"><span>Statistic (applies everywhere)</span></div><div class="pills" id="statPills"></div></div>
+        <div class="fbox"><div class="lbl"><span>Growth method</span></div><div class="pills" id="methodPills"></div></div>
         <div class="fbox"><div class="lbl"><span>Overlay</span></div><div class="pills" id="overlayPills"></div></div>
       </div>
       <div class="timebox">
@@ -246,25 +277,30 @@ table.dt td.l{text-align:left;}
       </div>
       <div class="legend" id="legend"></div>
       <div class="keyrow" id="keyrow"></div>
-      <div class="legend-note">District shapes are drawn from where each district's projects sit, clipped to URA's official coastline. Postal districts have no official boundary file, so edges are approximate.</div>
+      <div class="legend-note">District shapes are drawn from where each district's projects sit, clipped to URA's official coastline. There's no official boundary file for postal districts, so edges are approximate.</div>
     </div>
 
     <div class="panel" id="detail">
-      <h2 id="dTitle">All Singapore</h2>
+      <h2><span id="dTitle">All Singapore</span><button class="pinBtn" id="pinBtn">＋ Pin to compare</button></h2>
       <div class="crumbs" id="crumbs"></div>
       <div id="dBody"></div>
     </div>
   </div>
 
+  <div class="panel" id="pinWrap">
+    <h2>Pinned comparison <span class="hint">pin the whole island, a segment, a district or a project from its panel, the project list or the table below · same filters, statistic, growth method and time range</span></h2>
+    <div class="chips" id="pinChips"></div>
+    <div id="pinBody"></div>
+  </div>
+
   <div class="panel" id="compareWrap">
-    <h2>Compare districts <span class="hint">same filters, statistic and time range as the map · click a column to sort · click a row to open</span></h2>
+    <h2>Compare districts <span class="hint">same filters, statistic and time range as the map · click a column to sort · click a row to open · ＋ to pin</span></h2>
     <div class="tablewrap" style="max-height:560px"><table class="dt" id="cmpTable"></table></div>
   </div>
 
   <div class="note" id="footnote"></div>
   </div>
 </div>
-
 <script>
 "use strict";
 // ======================= constants & helpers =======================
@@ -273,13 +309,21 @@ const STAT_LABEL = {median:'Median', mean:'Mean', low:'Lowest', high:'Highest'};
 const SALE_LABEL = {1:'New sale', 2:'Sub sale', 3:'Resale'};
 const KIND_LABEL = {FH:'Freehold', '999':'999-yr (900+ yrs)', LH:'Leasehold (99-yr etc.)', UNK:'Unknown'};
 const UNITS_OPTS = [['single','Single unit'],['bulk','Bulk (2+ units)'],['all','Both']];
-const MIN_N_GROWTH = 3; // a period needs at least this many transactions to anchor CAGR / growth
-const MIN_YRS_GROWTH = 1; // and the two anchor periods must be at least this far apart
+const MIN_N_GROWTH = 3;   // raw method: a period needs this many tx to anchor CAGR / growth
+const MIN_YRS_GROWTH = 1; // anchors must be at least this far apart
+const BAND_LABELS = ['Studio / 1-bed','2-bed','3-bed','4-bed','5-bed+ / PH'];
+const DEFAULT_CUTS = [580, 850, 1200, 1600];
+const FG_LABELS = ['No floor (landed)','Basement','01–05','06–10','11–15','16–20','21–30','31–40','41+'];
+const LB_LABELS = ['Freehold','999-yr','95+ yrs left','90–95 yrs','85–90 yrs','80–85 yrs','70–80 yrs','60–70 yrs','Under 60 yrs','Lease unknown'];
+const AGE_LABELS = ['0–2 yrs','3–5','6–10','11–15','16–20','21–30','31+'];
+const HOLD_LABELS = ['< 1 yr','1–2 yrs','2–3 yrs','3–4 yrs','4–5 yrs','5–7 yrs','7+ yrs'];
 const PTYPE_GROUPS = {'Apartment':'Apartment','Condominium':'Condominium','Executive Condominium':'Executive condo',
   'Strata Terrace':'Strata landed','Strata Semi-detached':'Strata landed','Strata Detached':'Strata landed',
   'Terrace':'Landed','Semi-detached':'Landed','Detached':'Landed'};
-const QUICK = [['Non-landed',['Apartment','Condominium']],['+ EC',['Apartment','Condominium','Executive Condominium']],
+const NONLANDED = ['Apartment','Condominium','Executive Condominium'];
+const QUICK = [['Non-landed',['Apartment','Condominium']],['+ EC',NONLANDED],
   ['Landed only',['Strata Terrace','Strata Semi-detached','Strata Detached','Terrace','Semi-detached','Detached']],['All',null]];
+const SEG_NAME = {0:'Core Central Region',1:'Rest of Central Region',2:'Outside Central Region'};
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -293,19 +337,27 @@ const fmtYrs = v => v==null||!isFinite(v)?'—':v.toFixed(1)+' yrs';
 const fmtPct = v => v==null||!isFinite(v)?'—':(v>0?'+':'')+v.toFixed(1)+'%';
 const fmtN = v => v==null?'—':Math.round(v).toLocaleString('en-SG');
 const fmtVel = v => v==null||!isFinite(v)?'—':(v>=10?Math.round(v).toLocaleString('en-SG'):v.toFixed(1))+'/yr';
+const fmtRent = v => v==null||!isFinite(v)?'—':'$'+v.toFixed(2);
+const fmtYield = v => v==null||!isFinite(v)?'—':v.toFixed(2)+'%';
+function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+function lsGet(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
 // ======================= state =======================
-let D, M;                      // tx data, map data
-let N = 0;                     // rows
-let PSF, AREA, QA, YR;         // derived per-row arrays
-let QMIN, QMAX, MI_MIN, MI_MAX;
-let mask;                      // Uint8Array, rows passing every filter incl. time
-const S = { stat:'median', gran:'auto', metric:'psf', overlay:'segments', q0:0, q1:0,
+let D, M, N = 0;
+let PSF, AREA, QA, YR, BAND, FG, HARM;   // derived per-row arrays
+let QMIN, QMAX, MI_MIN, MI_MAX, NONLANDED_IDX;
+let mask;
+const S = { stat:'median', method:'lfl', gran:'auto', metric:'psf', overlay:'segments', q0:0, q1:0,
   ptypes:null, sales:new Set([1,2,3]), kinds:null, segs:new Set([0,1,2]), lease:[0,105], floorLo:0, floorHi:0, floorNone:true,
-  units:'single', prMin:null, prMax:null, psfMin:null, psfMax:null, arMin:null, arMax:null };
-const V = { minTx:1, level:'sg', d:null, p:null, seg:null, chartMetric:'psf', breakdown:'none', listMetric:'psf', listSort:'desc', search:'', txSort:{k:'mi',dir:-1}, showPeriodTable:false };
+  units:'single', prMin:null, prMax:null, psfMin:null, psfMax:null, arMin:null, arMax:null,
+  bands:new Set([0,1,2,3,4]), cuts:[...DEFAULT_CUTS], harm:new Set([0,1]), harmAdj:0 };
+const V = { level:'sg', d:null, p:null, seg:null, chartMetric:'psf', breakdown:'none', listMetric:'psf', listSort:'desc', minTx:3, search:'',
+  txSort:{k:'mi',dir:-1}, showPeriodTable:false, tab:'lease' };
 let cmpSort = {k:'d', dir:1};
-let chart = null;
+let chart = null, pinChart = null;
+let PINS = [];  // [{t:'sg'|'seg'|'d'|'p', id, slot}]
+let pinMetric = 'idx_psf';
 
 // ======================= load =======================
 Promise.all([fetch('data/tx.json').then(r=>r.json()), fetch('data/map.json').then(r=>r.json())]).then(([tx, map])=>{
@@ -314,35 +366,45 @@ Promise.all([fetch('data/tx.json').then(r=>r.json()), fetch('data/map.json').the
 
 function init(){
   const c = D.cols; N = c.mi.length;
-  PSF = new Float64Array(N); AREA = new Float64Array(N); QA = new Int32Array(N); YR = new Int32Array(N);
-  for(let i=0;i<N;i++){ const sqft = c.a[i]/10*SQFT; AREA[i]=sqft; PSF[i]=c.pr[i]/sqft; QA[i]=Math.floor(c.mi[i]/3); YR[i]=D.base_year+Math.floor(c.mi[i]/12); }
-  MI_MIN = c.mi[0]; MI_MAX = c.mi[N-1]; for(let i=0;i<N;i++){ if(c.mi[i]<MI_MIN) MI_MIN=c.mi[i]; if(c.mi[i]>MI_MAX) MI_MAX=c.mi[i]; }
-  QMIN = Math.floor(MI_MIN/3); QMAX = Math.floor(MI_MAX/3);
-  S.q0 = QMIN; S.q1 = QMAX;
-  S.ptypes = new Set(D.dict.ptype.map((_,i)=>i));
-  S.kinds = new Set(D.dict.kind.map((_,i)=>i));
+  QA = new Int32Array(N); YR = new Int32Array(N); FG = new Int8Array(N); HARM = new Int8Array(N);
+  MI_MIN = Infinity; MI_MAX = -Infinity;
+  const fgOf = D.dict.floor.map(f=>{ if(f==='-') return 0; if(/^B/i.test(f)) return 1; const n=parseInt(f,10); if(!isFinite(n)) return 0;
+    return n<=5?2:n<=10?3:n<=15?4:n<=20?5:n<=30?6:n<=40?7:8; });
+  for(let i=0;i<N;i++){ const m=c.mi[i]; QA[i]=Math.floor(m/3); YR[i]=D.base_year+Math.floor(m/12); FG[i]=fgOf[c.f[i]]; HARM[i]=D.projects[c.p[i]][11]||0;
+    if(m<MI_MIN) MI_MIN=m; if(m>MI_MAX) MI_MAX=m; }
+  NONLANDED_IDX = new Set(NONLANDED.map(n=>D.dict.ptype.indexOf(n)).filter(i=>i>=0));
+  QMIN = Math.floor(MI_MIN/3); QMAX = Math.floor(MI_MAX/3); S.q0 = QMIN; S.q1 = QMAX;
+  S.ptypes = new Set(D.dict.ptype.map((_,i)=>i)); S.kinds = new Set(D.dict.kind.map((_,i)=>i));
   S.floorLo = firstFloorIdx(); S.floorHi = D.dict.floor.length-1;
+  const savedCuts = lsGet('cuts', null); if(Array.isArray(savedCuts) && savedCuts.length===4) S.cuts = savedCuts;
+  computeDerived();
+  PINS = (lsGet('pins', []) || []).filter(p=>p && p.t && (p.t==='sg' || p.id!=null) && (p.t!=='p' || D.projects[p.id]));
   buildFilters(); buildMapControls(); buildMap();
   $('loading').style.display='none'; $('app').style.display='';
   recompute();
   $('footnote').innerHTML = footnote();
 }
 const firstFloorIdx = () => D.dict.floor[0]==='-' ? 1 : 0;
+// area / psf / size band depend on the harmonisation gross-up and the band cut-offs
+function computeDerived(){
+  const c=D.cols; if(!AREA){ AREA=new Float64Array(N); PSF=new Float64Array(N); BAND=new Int8Array(N); }
+  const adj = 1 + (S.harmAdj||0)/100; const [c0,c1,c2,c3]=S.cuts;
+  for(let i=0;i<N;i++){ let sqft = c.a[i]/10*SQFT; if(HARM[i]>0) sqft*=adj; AREA[i]=sqft; PSF[i]=c.pr[i]/sqft;
+    BAND[i] = NONLANDED_IDX.has(c.t[i]) ? (sqft<c0?0:sqft<c1?1:sqft<c2?2:sqft<c3?3:4) : -1; }
+}
 
 // ======================= period helpers =======================
 const qLabel = q => `${D.base_year+Math.floor(q/4)} Q${q%4+1}`;
 const effGran = () => S.gran==='auto' ? ((S.q1-S.q0+1)<=24?'quarter':'year') : S.gran;
 function periodOf(i, g){ return g==='quarter' ? QA[i] : YR[i]; }
 function periodLabel(p, g){ return g==='quarter' ? qLabel(p) : String(p); }
-function periodPartial(p, g){ // does the period extend beyond the data we hold?
+function periodsInRange(g){ const out=[]; if(g==='quarter'){ for(let q=S.q0;q<=S.q1;q++) out.push(q); } else { for(let y=D.base_year+Math.floor(S.q0/4); y<=D.base_year+Math.floor(S.q1/4); y++) out.push(y); } return out; }
+function periodPartial(p, g){
   const [m0,m1] = g==='quarter' ? [p*3, p*3+2] : [(p-D.base_year)*12, (p-D.base_year)*12+11];
-  const lo = Math.max(m0, S.q0*3), hi = Math.min(m1, S.q1*3+2);
-  return lo < MI_MIN || hi > MI_MAX || lo>m0 || hi<m1;
+  const lo = Math.max(m0, S.q0*3, MI_MIN), hi = Math.min(m1, S.q1*3+2, MI_MAX); return lo>m0 || hi<m1;
 }
-function rangeYears(){ // span of the selected range that is actually covered by data, in years
-  const lo = Math.max(S.q0*3, MI_MIN), hi = Math.min(S.q1*3+2, MI_MAX);
-  return Math.max(1, hi-lo+1)/12;
-}
+function rangeYears(){ const lo = Math.max(S.q0*3, MI_MIN), hi = Math.min(S.q1*3+2, MI_MAX); return Math.max(1, hi-lo+1)/12; }
+const rangeStartMi = () => Math.max(S.q0*3, MI_MIN);
 
 // ======================= filtering =======================
 function recomputeMask(){
@@ -352,9 +414,11 @@ function recomputeMask(){
   const fullLease = S.lease[0]<=0 && S.lease[1]>=105;
   const fNone = D.dict.floor.indexOf('-');
   const fullFloor = S.floorLo<=firstFloorIdx() && S.floorHi>=D.dict.floor.length-1;
+  const fullBands = S.bands.size===5; const bOK=new Uint8Array(5); S.bands.forEach(b=>bOK[b]=1);
   const lh = D.dict.kind.indexOf('LH');
   const lo = S.q0*3, hi = S.q1*3+2;
-  const a0 = S.arMin, a1 = S.arMax, p0=S.prMin, p1=S.prMax, s0=S.psfMin, s1=S.psfMax;
+  const a0=S.arMin, a1=S.arMax, p0=S.prMin, p1=S.prMax, s0=S.psfMin, s1=S.psfMax;
+  const hPre=S.harm.has(0), hNew=S.harm.has(1);
   let n=0;
   for(let i=0;i<N;i++){
     const mi = c.mi[i]; if(mi<lo||mi>hi) continue;
@@ -365,6 +429,8 @@ function recomputeMask(){
     if(k===lh && !fullLease){ const r=c.rl[i]; if(r<0 || r/10<S.lease[0] || r/10>S.lease[1]) continue; }
     const f=c.f[i];
     if(f===fNone){ if(!S.floorNone) continue; } else if(!fullFloor && (f<S.floorLo||f>S.floorHi)) continue;
+    if(!fullBands){ const b=BAND[i]; if(b<0 || !bOK[b]) continue; }
+    if(HARM[i]>0 ? !hNew : !hPre) continue;
     const u=c.u[i]; if(S.units==='single' && u>1) continue; if(S.units==='bulk' && u<2) continue;
     const pr=c.pr[i]; if(p0!=null && pr<p0) continue; if(p1!=null && pr>p1) continue;
     const ps=PSF[i]; if(s0!=null && ps<s0) continue; if(s1!=null && ps>s1) continue;
@@ -375,97 +441,182 @@ function recomputeMask(){
 }
 
 // ======================= statistics =======================
-// group summary from a list of row indices (already filtered)
-function summarize(idx){
-  const n = idx.length; if(!n) return {n:0};
-  const c = D.cols; const pr=new Float64Array(n), ps=new Float64Array(n), ar=new Float64Array(n); const ls=[];
-  let units=0;
-  for(let j=0;j<n;j++){ const i=idx[j]; pr[j]=c.pr[i]; ps[j]=PSF[i]; ar[j]=AREA[i]; units+=c.u[i]; if(c.rl[i]>=0 && D.dict.kind[c.k[i]]==='LH') ls.push(c.rl[i]/10); }
-  return {n, units, PRICE:dstat(pr), PSF:dstat(ps), AREA:dstat(ar), LEASE:dstat(Float64Array.from(ls))};
-}
 function dstat(a){ const n=a.length; if(!n) return null; a.sort(); let s=0; for(let i=0;i<n;i++) s+=a[i];
   const med = n%2 ? a[(n-1)/2] : (a[n/2-1]+a[n/2])/2; return {mean:s/n, median:med, low:a[0], high:a[n-1], n}; }
+function median(arr){ if(!arr.length) return null; return dstat(Float64Array.from(arr)).median; }
+let SUMCACHE = new WeakMap();
+function summarize(idx){ let r=SUMCACHE.get(idx); if(!r){ r=summarize0(idx); SUMCACHE.set(idx,r); } return r; }
+function summarize0(idx){
+  const n = idx.length; if(!n) return {n:0};
+  const c = D.cols; const pr=new Float64Array(n), ps=new Float64Array(n), ar=new Float64Array(n); const ls=[];
+  let units=0, harm=0;
+  for(let j=0;j<n;j++){ const i=idx[j]; pr[j]=c.pr[i]; ps[j]=PSF[i]; ar[j]=AREA[i]; units+=c.u[i]; if(HARM[i]>0) harm++; if(c.rl[i]>=0 && D.dict.kind[c.k[i]]==='LH') ls.push(c.rl[i]/10); }
+  return {n, units, harm, PRICE:dstat(pr), PSF:dstat(ps), AREA:dstat(ar), LEASE:dstat(Float64Array.from(ls))};
+}
 const pick = (sum, dim) => sum && sum[dim] ? sum[dim][S.stat] : null;
 function nContext(n){ return S.stat==='low' ? `lowest of ${fmtN(n)} tx` : S.stat==='high' ? `highest of ${fmtN(n)} tx` : `n = ${fmtN(n)}`; }
+const valOf = (i, dim) => dim==='PRICE' ? D.cols.pr[i] : PSF[i];
 
-// per-period values of one dimension for a group, under the current statistic
+// ---- raw method: per-period statistic of all matching transactions, first vs last period ----
 function periodSeries(idx, dim, g){
-  const by = new Map(); const c=D.cols;
+  const by = new Map();
   for(const i of idx){ const p=periodOf(i,g); let a=by.get(p); if(!a){a=[];by.set(p,a);} a.push(i); }
-  const keys=[...by.keys()].sort((a,b)=>a-b);
-  return keys.map(p=>{ const rows=by.get(p); const vals=new Float64Array(rows.length); let k=0;
-    if(dim==='PRICE') for(const i of rows) vals[k++]=c.pr[i]; else for(const i of rows) vals[k++]=PSF[i];
-    const st=dstat(vals); return {p, n:rows.length, v:st[S.stat]}; });
+  return [...by.keys()].sort((a,b)=>a-b).map(p=>{ const rows=by.get(p); const vals=new Float64Array(rows.length); let k=0;
+    for(const i of rows) vals[k++]=valOf(i,dim); const st=dstat(vals); return {p, n:rows.length, v:st[S.stat]}; });
 }
-function growth(idx, dim){
-  const g=effGran(); const ser=periodSeries(idx, dim, g).filter(x=>x.n>=MIN_N_GROWTH);
+function growthRaw(idx, dim){
+  const g=effGran(); let ser=periodSeries(idx, dim, g).filter(x=>x.n>=MIN_N_GROWTH);
+  const full=ser.filter(x=>!periodPartial(x.p,g)); if(full.length>=2) ser=full;   // don't anchor on incomplete periods
   if(ser.length<2) return {cagr:null, total:null};
   const a=ser[0], b=ser[ser.length-1]; const yrs = g==='quarter' ? (b.p-a.p)/4 : (b.p-a.p);
   if(yrs<MIN_YRS_GROWTH || !(a.v>0)) return {cagr:null,total:null};
-  const tot=b.v/a.v; return {cagr:(Math.pow(tot,1/yrs)-1)*100, total:(tot-1)*100, from:periodLabel(a.p,g), to:periodLabel(b.p,g), yrs};
+  const tot=b.v/a.v; return {cagr:(Math.pow(tot,1/yrs)-1)*100, total:(tot-1)*100, from:periodLabel(a.p,g), to:periodLabel(b.p,g), yrs, method:'raw'};
+}
+// ---- same-project method: repeat-sales index on (project x size band) medians ----
+// Each "unit" is a project's size band (landed: project x property type). For every unit, consecutive periods in
+// which it traded give a log price change; a weighted least-squares fit of one log level per period to all those
+// changes (the Bailey-Muth-Nourse repeat-sales estimator, here on unit medians) gives an index free of the mix of
+// which projects / sizes happened to sell. A tiny smoothness penalty only bridges periods no unit connects.
+function rsIndex(idx, g, dim){
+  const periods = periodsInRange(g); const P = periods.length; if(P<2) return null;
+  const p0 = periods[0]; const pos = p => g==='quarter' ? p-p0 : p-p0;
+  const c=D.cols; const cells = new Map();
+  for(const i of idx){ const b=BAND[i]; const u = c.p[i]*16 + (b>=0 ? b : 8 + (c.t[i]%8)); const t=pos(periodOf(i,g)); if(t<0||t>=P) continue;
+    let m=cells.get(u); if(!m){ m=new Map(); cells.set(u,m); } let a=m.get(t); if(!a){ a=[]; m.set(t,a); } a.push(valOf(i,dim)); }
+  const A = Array.from({length:P},()=>new Float64Array(P)); const rhs = new Float64Array(P); const cov = new Int32Array(P);
+  let pairs=0, units=0, wsum=0;
+  cells.forEach(m=>{ const ts=[...m.keys()].sort((a,b)=>a-b); if(ts.length<2) return; units++;
+    let prevT=ts[0], prevMed=median(m.get(prevT)), prevN=m.get(prevT).length;
+    for(let j=1;j<ts.length;j++){ const t=ts[j], arr=m.get(t), med=median(arr), n=arr.length;
+      if(prevMed>0 && med>0){ let r=Math.log(med/prevMed); r=Math.max(-0.7,Math.min(0.7,r)); const w=Math.sqrt(Math.min(n,prevN));
+        A[prevT][prevT]+=w; A[t][t]+=w; A[prevT][t]-=w; A[t][prevT]-=w; rhs[t]+=w*r; rhs[prevT]-=w*r; cov[prevT]++; cov[t]++; pairs++; wsum+=w; }
+      prevT=t; prevMed=med; prevN=n; } });
+  if(!pairs) return {periods, beta:null, cov, pairs, units};
+  const lam = 1e-3*wsum/P + 1e-9;
+  for(let t=1;t<P;t++){ A[t-1][t-1]+=lam; A[t][t]+=lam; A[t-1][t]-=lam; A[t][t-1]-=lam; }
+  // fix beta[0]=0: solve the (P-1)x(P-1) system for beta[1..]
+  const n=P-1; const Mx = Array.from({length:n},(_,r)=>{ const row=new Float64Array(n+1); for(let k=0;k<n;k++) row[k]=A[r+1][k+1]; row[n]=rhs[r+1]; return row; });
+  for(let col=0; col<n; col++){ let piv=col; for(let r=col+1;r<n;r++) if(Math.abs(Mx[r][col])>Math.abs(Mx[piv][col])) piv=r;
+    if(Math.abs(Mx[piv][col])<1e-12) continue; [Mx[col],Mx[piv]]=[Mx[piv],Mx[col]];
+    for(let r=0;r<n;r++){ if(r===col) continue; const f=Mx[r][col]/Mx[col][col]; if(!f) continue; for(let k=col;k<=n;k++) Mx[r][k]-=f*Mx[col][k]; } }
+  const beta = new Float64Array(P); for(let r=0;r<n;r++) beta[r+1] = Math.abs(Mx[r][r])>1e-12 ? Mx[r][n]/Mx[r][r] : 0;
+  return {periods, beta, cov, pairs, units};
+}
+function growthLFL(idx, dim){
+  const g=effGran(); const R=rsIndex(idx,g,dim); if(!R||!R.beta) return {cagr:null,total:null, pairs:R?R.pairs:0};
+  const anchors=(skipPartial)=>{ let a=-1,b=-1; for(let t=0;t<R.periods.length;t++){ if(R.cov[t]>0 && !(skipPartial && periodPartial(R.periods[t],g))){ if(a<0) a=t; b=t; } } return [a,b]; };
+  let [a,b]=anchors(true); if(a<0||b<=a) [a,b]=anchors(false);   // don't anchor on incomplete periods unless nothing else exists
+  if(a<0||b<=a) return {cagr:null,total:null};
+  const yrs = g==='quarter' ? (b-a)/4 : (b-a); if(yrs<MIN_YRS_GROWTH) return {cagr:null,total:null, pairs:R.pairs};
+  const tot=Math.exp(R.beta[b]-R.beta[a]);
+  return {cagr:(Math.pow(tot,1/yrs)-1)*100, total:(tot-1)*100, from:periodLabel(R.periods[a],g), to:periodLabel(R.periods[b],g), yrs, pairs:R.pairs, units:R.units, method:'lfl'};
+}
+let GCACHE = new WeakMap();  // idx array -> {key: result}; arrays are rebuilt on every recompute, so this resets itself
+function growth(idx, dim){ const key=S.method+dim+effGran()+S.stat; let m=GCACHE.get(idx); if(!m){ m={}; GCACHE.set(idx,m); }
+  if(!(key in m)) m[key] = S.method==='lfl' ? growthLFL(idx,dim) : growthRaw(idx,dim); return m[key]; }
+
+// ---- rentals (URA median rents: non-landed, project x quarter, no contract counts) ----
+function rentRows(scope){
+  const out=[]; const R=D.rent;
+  for(const r of R){ const qa=r[1]; if(qa<S.q0||qa>S.q1) continue; const P=D.projects[r[0]]; if(!P) continue;
+    if(!S.segs.has(P[3])) continue; if(P[9]>=0 && !S.ptypes.has(P[9])) continue;
+    if(scope.t==='seg' && P[3]!==scope.id) continue; if(scope.t==='d' && P[2]!==scope.id) continue; if(scope.t==='p' && r[0]!==scope.id) continue;
+    out.push(r); }
+  return out;
+}
+const RCACHE = new Map();
+function rentStats(scope, rowsOverride){
+  if(!rowsOverride){ const k=scopeKey(scope); if(RCACHE.has(k)) return RCACHE.get(k); const v=rentStats(scope, rentRows(scope)); RCACHE.set(k,v); return v; }
+  const rows = rowsOverride; if(!rows.length) return null;
+  const byQ=new Map(); rows.forEach(r=>{ let a=byQ.get(r[1]); if(!a){a=[];byQ.set(r[1],a);} a.push(r[2]); });
+  const qs=[...byQ.keys()].sort((a,b)=>a-b); const series=qs.map(q=>({q, v:median(byQ.get(q)), n:byQ.get(q).length}));
+  const last=series[series.length-1]; const prev=series.find(s=>s.q===last.q-4);
+  // gross yield: latest rent x 12 / median resale $psf of the same scope over the last 4 quarters of the range
+  const idx=rowsForScope(scope); const c=D.cols; const ps=[]; for(const i of idx){ if(c.s[i]===3 && QA[i]>last.q-4 && QA[i]<=last.q && BAND[i]>=0) ps.push(PSF[i]); }
+  const resale = ps.length>=3 ? median(ps) : null;
+  return {q:last.q, med:last.v, n:last.n, chg: prev? (last.v/prev.v-1)*100 : null, series, yield: resale? last.v*12/resale*100 : null, resale};
 }
 
-// metric catalogue: one definition used by map, compare table, project list and ranks
+// metric catalogue (one definition for map, compare table, project list, pins and ranks)
 const RM = {
-  price:     {get label(){return `${STAT_LABEL[S.stat]} price`;}, short:'Price', calc:(idx,sum)=>pick(sum,'PRICE'), fmt:v=>fmtMoney(v), fmtC:v=>fmtMoney(v,true)},
-  psf:       {get label(){return `${STAT_LABEL[S.stat]} $psf`;}, short:'$psf', calc:(idx,sum)=>pick(sum,'PSF'), fmt:fmtPsf, fmtC:fmtPsf},
-  area:      {get label(){return `${STAT_LABEL[S.stat]} area`;}, short:'Area', calc:(idx,sum)=>pick(sum,'AREA'), fmt:fmtArea, fmtC:v=>v==null?'—':Math.round(v).toLocaleString('en-SG')},
-  lease:     {get label(){return `${STAT_LABEL[S.stat]} lease left`;}, short:'Lease left', calc:(idx,sum)=>pick(sum,'LEASE'), fmt:fmtYrs, fmtC:v=>v==null?'—':v.toFixed(0)+'y', note:'leasehold rows only'},
-  cagr_psf:  {label:'CAGR, $psf', short:'CAGR $psf', calc:idx=>growth(idx,'PSF').cagr, fmt:fmtPct, fmtC:fmtPct, div:true},
-  cagr_price:{label:'CAGR, price', short:'CAGR price', calc:idx=>growth(idx,'PRICE').cagr, fmt:fmtPct, fmtC:fmtPct, div:true},
-  tot_psf:   {label:'Total growth, $psf', short:'Growth $psf', calc:idx=>growth(idx,'PSF').total, fmt:fmtPct, fmtC:fmtPct, div:true},
-  tot_price: {label:'Total growth, price', short:'Growth price', calc:idx=>growth(idx,'PRICE').total, fmt:fmtPct, fmtC:fmtPct, div:true},
-  velocity:  {label:'Velocity (tx per year)', short:'Velocity', calc:(idx)=>idx.length? idx.length/rangeYears():null, fmt:fmtVel, fmtC:v=>v==null?'—':(v>=10?Math.round(v):v.toFixed(1)), noStat:true},
+  price:     {get label(){return `${STAT_LABEL[S.stat]} price`;}, calc:(idx,sum)=>pick(sum,'PRICE'), fmt:v=>fmtMoney(v), fmtC:v=>fmtMoney(v,true)},
+  psf:       {get label(){return `${STAT_LABEL[S.stat]} $psf`;}, calc:(idx,sum)=>pick(sum,'PSF'), fmt:fmtPsf, fmtC:fmtPsf},
+  area:      {get label(){return `${STAT_LABEL[S.stat]} area`;}, calc:(idx,sum)=>pick(sum,'AREA'), fmt:fmtArea, fmtC:v=>v==null?'—':Math.round(v).toLocaleString('en-SG')},
+  lease:     {get label(){return `${STAT_LABEL[S.stat]} lease left`;}, calc:(idx,sum)=>pick(sum,'LEASE'), fmt:fmtYrs, fmtC:v=>v==null?'—':v.toFixed(0)+'y', note:'leasehold only'},
+  cagr_psf:  {get label(){return `CAGR, $psf${S.method==='lfl'?' (same project)':''}`;}, calc:idx=>growth(idx,'PSF').cagr, fmt:fmtPct, fmtC:fmtPct, div:true},
+  cagr_price:{get label(){return `CAGR, price${S.method==='lfl'?' (same project)':''}`;}, calc:idx=>growth(idx,'PRICE').cagr, fmt:fmtPct, fmtC:fmtPct, div:true},
+  tot_psf:   {get label(){return `Total growth, $psf${S.method==='lfl'?' (same project)':''}`;}, calc:idx=>growth(idx,'PSF').total, fmt:fmtPct, fmtC:fmtPct, div:true},
+  tot_price: {get label(){return `Total growth, price${S.method==='lfl'?' (same project)':''}`;}, calc:idx=>growth(idx,'PRICE').total, fmt:fmtPct, fmtC:fmtPct, div:true},
+  velocity:  {label:'Velocity (tx per year)', calc:idx=>idx.length? idx.length/rangeYears():null, fmt:fmtVel, fmtC:v=>v==null?'—':(v>=10?Math.round(v):v.toFixed(1))},
+  rent:      {label:'Median rent ($psf / month)', scoped:true, calc:(idx,sum,scope)=>{ const r=rentStats(scope); return r?r.med:null; }, fmt:fmtRent, fmtC:fmtRent, note:'latest quarter in range, non-landed'},
+  yield:     {label:'Gross rental yield', scoped:true, calc:(idx,sum,scope)=>{ const r=rentStats(scope); return r?r.yield:null; }, fmt:fmtYield, fmtC:v=>v==null?'—':v.toFixed(1)+'%', note:'latest rent × 12 ÷ resale $psf'},
 };
-const MAP_METRICS = ['psf','price','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','velocity'];
+const MAP_METRICS = ['psf','price','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','velocity','rent','yield'];
 
-// ======================= grouping =======================
-let BY_D = null, BY_SEG = null, ALL = null, SUM_D = null;
+// ======================= grouping & scopes =======================
+let BY_D=null, BY_SEG=null, ALL=null, SUM_D=null, BY_P=null;
 function groupAll(){
-  const c=D.cols; BY_D = Array.from({length:29},()=>[]); BY_SEG=[[],[],[]]; ALL=[];
-  for(let i=0;i<N;i++){ if(!mask[i]) continue; ALL.push(i); BY_D[c.d[i]].push(i); if(c.g[i]>=0) BY_SEG[c.g[i]].push(i); }
+  const c=D.cols; BY_D = Array.from({length:29},()=>[]); BY_SEG=[[],[],[]]; ALL=[]; BY_P=new Map();
+  for(let i=0;i<N;i++){ if(!mask[i]) continue; ALL.push(i); BY_D[c.d[i]].push(i); if(c.g[i]>=0) BY_SEG[c.g[i]].push(i);
+    let a=BY_P.get(c.p[i]); if(!a){a=[];BY_P.set(c.p[i],a);} a.push(i); }
   SUM_D = BY_D.map(idx=>summarize(idx));
 }
+function rowsForScope(sc){ if(sc.t==='seg') return BY_SEG[sc.id]; if(sc.t==='d') return BY_D[sc.id]; if(sc.t==='p') return BY_P.get(sc.id)||[]; return ALL; }
+const scopeKey = sc => sc.t+':'+(sc.id??'');
+function scopeLabel(sc){ if(sc.t==='sg') return 'All Singapore'; if(sc.t==='seg') return D.dict.seg[sc.id]; if(sc.t==='d') return 'D'+String(sc.id).padStart(2,'0')+' '+(M.names[String(sc.id).padStart(2,'0')]||'').split(',')[0];
+  const P=D.projects[sc.id]; return P[7] ? P[1]+' (landed)' : P[0]; }
 const metricCache = new Map();
-function districtMetric(key, d){ const ck=key+'|'+d; if(metricCache.has(ck)) return metricCache.get(ck);
-  const v = RM[key].calc(BY_D[d], SUM_D[d]); metricCache.set(ck,v); return v; }
-function rankAmong(entries, ownKey){ // entries: [{k, v}]
-  const e = entries.filter(x=>x.v!=null && isFinite(x.v)).sort((a,b)=>b.v-a.v);
-  const i = e.findIndex(x=>x.k===ownKey); return i<0?'':`#${i+1} of ${e.length}`;
-}
+function metricFor(key, sc){ const ck=key+'|'+scopeKey(sc); if(metricCache.has(ck)) return metricCache.get(ck);
+  const idx=rowsForScope(sc); const sum = sc.t==='d' ? SUM_D[sc.id] : summarize(idx);
+  const v = RM[key].scoped || idx.length ? RM[key].calc(idx, sum, sc) : null; metricCache.set(ck,v); return v; }
+const districtMetric = (key,d) => metricFor(key,{t:'d',id:d});
+function rankAmong(entries, ownKey){ const e = entries.filter(x=>x.v!=null && isFinite(x.v)).sort((a,b)=>b.v-a.v);
+  const i = e.findIndex(x=>x.k===ownKey); return i<0?'':`#${i+1} of ${e.length}`; }
+function currentScope(){ if(V.level==='district') return {t:'d',id:V.d}; if(V.level==='seg') return {t:'seg',id:V.seg}; if(V.level==='project') return {t:'p',id:V.p}; return {t:'sg'}; }
 
 // ======================= orchestration =======================
 let raf = null;
 function recompute(){ if(raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(()=>{ raf=null; doRecompute(); }); }
 function doRecompute(){
-  const n = recomputeMask(); metricCache.clear(); groupAll();
+  const n = recomputeMask(); metricCache.clear(); RCACHE.clear(); SUMCACHE=new WeakMap(); GCACHE=new WeakMap(); groupAll();
   $('matchCount').innerHTML = `<b>${fmtN(n)}</b> of ${fmtN(N)} transactions match · ${esc(qLabel(S.q0))} – ${esc(qLabel(S.q1))}${mixWarning()}`;
-  updateTimeLabel(); renderMap(); renderDetail(); renderCompare();
+  updateTimeLabel(); renderMap(); renderDetail();
+  clearTimeout(lateT); lateT=setTimeout(()=>{ renderPins(); renderCompare(); }, 30);
 }
-function mixWarning(){ const c=D.cols; let land=0, strata=0; for(const i of ALL){ if(c.ar[i]) land++; else strata++; if(land&&strata) break; }
-  return land&&strata ? ` · <span style="color:var(--warn)">mixes landed (land-area $psf) with strata (floor-area $psf)</span>` : ''; }
+let lateT=null;
+function mixWarning(){ const c=D.cols; let land=0, strata=0, h=0, pre=0; for(const i of ALL){ if(c.ar[i]) land++; else strata++; if(HARM[i]>0) h++; else pre++; if(land&&strata&&h&&pre) break; }
+  let w=''; if(land&&strata) w+=` · <span style="color:var(--warn)">mixes landed (land-area $psf) with strata (floor-area $psf)</span>`;
+  if(h&&pre&&!S.harmAdj) w+=` · <span style="color:var(--warn)">mixes harmonised and pre-harmonisation floor areas</span>`; return w; }
 
 // ======================= filters UI =======================
 function pillGroup(el, items, isOn, onClick){ el.innerHTML=''; items.forEach(([val,label,title])=>{ const s=document.createElement('span');
   s.className='pill'+(isOn(val)?' on':''); s.textContent=label; s.tabIndex=0; s.setAttribute('role','button'); if(title) s.title=title;
   s.onclick=()=>onClick(val); s.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); onClick(val);} }; el.appendChild(s); }); }
-function toggleSet(set, v, all){ if(set.has(v)){ if(set.size>1) set.delete(v); } else set.add(v); }
+function toggleSet(set, v){ if(set.has(v)){ if(set.size>1) set.delete(v); } else set.add(v); }
 function buildFilters(){
   const cnt = (col, v) => { let n=0; const a=D.cols[col]; for(let i=0;i<N;i++) if(a[i]===v) n++; return n; };
   const ptCounts = D.dict.ptype.map((_,i)=>cnt('t',i));
-  const drawPt = ()=>{ pillGroup($('fPtype'), D.dict.ptype.map((p,i)=>[i,p,`${fmtN(ptCounts[i])} transactions in archive`]), v=>S.ptypes.has(v), v=>{ toggleSet(S.ptypes,v); drawPt(); recompute(); }); };
+  const drawPt = ()=>pillGroup($('fPtype'), D.dict.ptype.map((p,i)=>[i,p,`${fmtN(ptCounts[i])} transactions in archive`]), v=>S.ptypes.has(v), v=>{ toggleSet(S.ptypes,v); drawPt(); recompute(); });
   drawPt();
   pillGroup($('fPtypeQuick'), QUICK.map(([l])=>[l,l]), ()=>false, l=>{ const q=QUICK.find(x=>x[0]===l)[1];
     S.ptypes = new Set(q? q.map(n=>D.dict.ptype.indexOf(n)).filter(i=>i>=0) : D.dict.ptype.map((_,i)=>i)); drawPt(); recompute(); });
   [...$('fPtypeQuick').children].forEach(s=>s.classList.add('ghost'));
+  const bandTitle = b => { const c=S.cuts; return b===0?`under ${c[0]} sqft`:b===4?`${c[3]}+ sqft`:`${c[b-1]}–${c[b]-1} sqft`; };
+  const drawBand=()=>pillGroup($('fBand'), BAND_LABELS.map((l,b)=>[b,l,bandTitle(b)]), v=>S.bands.has(v), v=>{ toggleSet(S.bands,v); drawBand(); recompute(); });
+  drawBand();
+  $('bandEditBtn').onclick=()=>$('bandEdit').classList.toggle('show');
+  [0,1,2,3].forEach(j=>{ const e=$('cut'+j); e.value=S.cuts[j]; e.oninput=debounce(()=>{ const v=[0,1,2,3].map(k=>+$('cut'+k).value);
+    if(v.every((x,k)=>x>0 && (k===0||x>v[k-1]))){ S.cuts=v; lsSet('cuts',v); computeDerived(); drawBand(); recompute(); } },400); });
   const drawSale=()=>pillGroup($('fSale'), [1,2,3].map(v=>[v,SALE_LABEL[v]]), v=>S.sales.has(v), v=>{toggleSet(S.sales,v); drawSale(); recompute();}); drawSale();
-  const drawSeg=()=>pillGroup($('fSeg'), D.dict.seg.map((s,i)=>[i,s,{CCR:'Core Central Region',RCR:'Rest of Central Region',OCR:'Outside Central Region'}[s]]), v=>S.segs.has(v), v=>{toggleSet(S.segs,v); drawSeg(); recompute();}); drawSeg();
+  const drawSeg=()=>pillGroup($('fSeg'), D.dict.seg.map((s,i)=>[i,s,SEG_NAME[i]]), v=>S.segs.has(v), v=>{toggleSet(S.segs,v); drawSeg(); recompute();}); drawSeg();
   const kc = D.dict.kind.map((_,i)=>cnt('k',i));
   const drawKind=()=>pillGroup($('fKind'), D.dict.kind.map((k,i)=>[i,KIND_LABEL[k]||k]).filter(([i])=>kc[i]>0), v=>S.kinds.has(v), v=>{toggleSet(S.kinds,v); drawKind(); recompute();}); drawKind();
+  const H=D.harmonisation||{};
+  const drawHarm=()=>pillGroup($('fHarm'), [[0,'Pre-harmonisation'],[1,'Harmonised','confirmed ('+(H.n_confirmed||0)+') + likely by rule ('+(H.n_likely||0)+')']], v=>S.harm.has(v), v=>{toggleSet(S.harm,v); drawHarm(); recompute();}); drawHarm();
+  $('harmAdj').value = S.harmAdj||''; $('adjLbl').textContent = S.harmAdj? S.harmAdj+'%':'off';
+  $('harmAdj').oninput=debounce(e=>{ const v=Math.max(0,Math.min(20,+e.target.value||0)); S.harmAdj=v; $('adjLbl').textContent=v?v+'%':'off'; computeDerived(); recompute(); },400);
   const drawUnits=()=>pillGroup($('fUnits'), UNITS_OPTS, v=>S.units===v, v=>{S.units=v; drawUnits(); recompute();}); drawUnits();
-  // lease slider
   dualRange('leaseLo','leaseHi',0,105,1,()=>S.lease,v=>{S.lease=v;}, v=> (v[0]<=0&&v[1]>=105)?'any':`${v[0]}–${v[1]} yrs`, 'leaseLbl');
-  // floor slider
   const f0=firstFloorIdx(), f1=D.dict.floor.length-1;
   dualRange('floorLo','floorHi',f0,f1,1,()=>[S.floorLo,S.floorHi],v=>{S.floorLo=v[0];S.floorHi=v[1];}, v=> (v[0]<=f0&&v[1]>=f1)?'any':`${D.dict.floor[v[0]]} to ${D.dict.floor[v[1]]}`, 'floorLbl');
   $('floorNone').onchange=e=>{S.floorNone=e.target.checked; recompute();};
@@ -473,21 +624,18 @@ function buildFilters(){
   num('prMin','prMin'); num('prMax','prMax'); num('psfMin','psfMin'); num('psfMax','psfMax'); num('arMin','arMin'); num('arMax','arMax');
   $('fToggle').onclick=()=>{ const g=$('fgrid'); g.classList.toggle('collapsed'); $('fToggle').textContent = g.classList.contains('collapsed')?'Show filters':'Hide filters'; };
   $('fReset').onclick=()=>{ S.ptypes=new Set(D.dict.ptype.map((_,i)=>i)); S.sales=new Set([1,2,3]); S.segs=new Set([0,1,2]); S.kinds=new Set(D.dict.kind.map((_,i)=>i));
-    S.lease=[0,105]; S.floorLo=f0; S.floorHi=f1; S.floorNone=true; S.units='single'; ['prMin','prMax','psfMin','psfMax','arMin','arMax'].forEach(k=>{S[k]=null;});
-    ['prMin','prMax','psfMin','psfMax','arMin','arMax'].forEach(id=>$(id).value=''); $('floorNone').checked=true; buildFilters(); recompute(); };
+    S.lease=[0,105]; S.floorLo=f0; S.floorHi=f1; S.floorNone=true; S.units='single'; S.bands=new Set([0,1,2,3,4]); S.harm=new Set([0,1]); S.harmAdj=0;
+    ['prMin','prMax','psfMin','psfMax','arMin','arMax'].forEach(k=>{S[k]=null; $(k).value='';}); $('floorNone').checked=true; computeDerived(); buildFilters(); recompute(); };
 }
-const dualSetters = {};
 function dualRange(idLo,idHi,min,max,step,get,set,label,lblId){
   const lo=$(idLo), hi=$(idHi); [lo,hi].forEach(e=>{e.min=min; e.max=max; e.step=step;});
   const v=get(); lo.value=v[0]; hi.value=v[1]; $(lblId).textContent=label(v);
   const upd=(which)=>{ let a=+lo.value, b=+hi.value; if(a>b){ if(which==='lo') a=b; else b=a; lo.value=a; hi.value=b; } set([a,b]); $(lblId).textContent=label([a,b]); recompute(); };
   lo.oninput=()=>upd('lo'); hi.oninput=()=>upd('hi');
-  dualSetters[idLo]=(a,b)=>{ lo.value=a; hi.value=b; $(lblId).textContent=label([a,b]); };
 }
-function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
-
 function buildMapControls(){
   const drawStat=()=>pillGroup($('statPills'), Object.entries(STAT_LABEL), v=>S.stat===v, v=>{S.stat=v; drawStat(); drawMetric(); recompute();}); drawStat();
+  const drawMethod=()=>pillGroup($('methodPills'), [['lfl','Same project','Like-for-like: repeat-sales index on each project\'s size bands, so a wave of new launches or a shift in which projects sell does not masquerade as growth. Uses medians.'],['raw','All transactions','Statistic of everything that sold in the first vs the last period.']], v=>S.method===v, v=>{S.method=v; drawMethod(); drawMetric(); recompute();}); drawMethod();
   const drawMetric=()=>pillGroup($('metricPills'), MAP_METRICS.map(k=>[k, RM[k].label]), v=>S.metric===v, v=>{S.metric=v; drawMetric(); recompute();});
   window._drawMetric = drawMetric; drawMetric();
   const drawOv=()=>pillGroup($('overlayPills'), [['segments','CCR / RCR / OCR'],['none','None']], v=>S.overlay===v, v=>{S.overlay=v; drawOv(); renderMap();}); drawOv();
@@ -499,8 +647,9 @@ function buildMapControls(){
   const presets=[['All',spanQ],['10Y',40],['5Y',20],['3Y',12],['2Y',8],['1Y',4],['Latest Q',1]].filter(([l,q],i)=>i===0||q<spanQ);
   pillGroup($('presets'), presets.map(([l,q])=>[q,l]), ()=>false, q=>{ S.q1=QMAX; S.q0=Math.max(QMIN,QMAX-q+1); lo.value=S.q0; hi.value=S.q1; recompute(); });
   $('themeBtn').onclick=()=>{ const r=document.documentElement; const dark = r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    r.dataset.theme = dark?'light':'dark'; try{localStorage.setItem('theme',r.dataset.theme);}catch(e){} renderMap(); renderDetail(); };
-  try{ const t=localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme=t; }catch(e){}
+    r.dataset.theme = dark?'light':'dark'; lsSet('theme',r.dataset.theme); renderMap(); renderDetail(); renderPins(); };
+  const t=lsGet('theme',null); if(t) document.documentElement.dataset.theme=t;
+  $('pinBtn').onclick=()=>togglePin(currentScope());
 }
 function updateTimeLabel(){ const g=effGran(); $('timeLbl').textContent = `${qLabel(S.q0)} – ${qLabel(S.q1)} · ${((S.q1-S.q0+1)/4).toFixed(2).replace(/\.?0+$/,'')} yrs · ${g==='quarter'?'quarterly':'yearly'} periods`; }
 
@@ -517,12 +666,12 @@ function buildMap(){
     p.addEventListener('mousemove',e=>showTip(e,k)); p.addEventListener('mouseleave',hideTip);
     p.addEventListener('click',()=>openDistrict(+k)); p.addEventListener('keydown',e=>{ if(e.key==='Enter') openDistrict(+k); });
     distEls[k]=p; });
-  el('g',{id:'gSeg'},svg); el('g',{id:'gDots'},svg);
+  const gS=el('g',{id:'gSeg'},svg); el('g',{id:'gDots'},svg);
   const gL=el('g',{id:'gLab'},svg);
   Object.entries(M.districts).forEach(([k,v])=>{ const t=el('text',{x:v.label[0], y:v.label[1], class:'dlab'},gL); t.textContent=k;
     const tv=el('text',{x:v.label[0], y:v.label[1]+13, class:'dval'},gL); labEls[k]=[t,tv]; });
-  const gS=$('gSeg');
   Object.entries(M.segments).forEach(([k,v])=>{ if(k==='OCR') return; el('path',{d:v.path,class:'seg-outline '+k},gS); });
+  $('zoomBtn').onclick=()=>{ zoomOn=!zoomOn; applyZoom(); };
 }
 function colourScale(vals, diverging){
   const v=vals.filter(x=>x!=null&&isFinite(x)).sort((a,b)=>a-b); if(!v.length) return null;
@@ -536,49 +685,41 @@ function colourScale(vals, diverging){
   }
   const k=5; const br=Array.from({length:k+1},(_,i)=>v[Math.min(v.length-1,Math.round(i/k*(v.length-1)))]);
   const cols=['--seq-1','--seq-2','--seq-3','--seq-4','--seq-5'].map(css);
-  const f=x=>{ for(let i=1;i<k;i++) if(x<br[i]) return cols[i-1]; return cols[k-1]; };
-  return {f, br, cols};
+  return {f:x=>{ for(let i=1;i<k;i++) if(x<br[i]) return cols[i-1]; return cols[k-1]; }, br, cols};
 }
 function inkFor(bg){ const m=bg.match(/^#?([0-9a-f]{6})$/i); if(!m) return css('--ink'); const n=parseInt(m[1],16); const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
-  const L=(0.2126*r+0.7152*g+0.0722*b)/255; return L>0.55?'#14201C':'#F4F7F6'; }
-let SCALE=null;
+  return (0.2126*r+0.7152*g+0.0722*b)/255>0.55?'#14201C':'#F4F7F6'; }
+let SCALE=null, zoomOn=true;
 function renderMap(){
   if(!BY_D) return;
   const key=S.metric, rm=RM[key];
-  const vals={}; for(let d=1; d<=28; d++){ vals[d]=districtMetric(key,d); }
+  const vals={}; for(let d=1; d<=28; d++) vals[d]=districtMetric(key,d);
   SCALE = colourScale(Object.values(vals), !!rm.div);
   Object.entries(distEls).forEach(([k,p])=>{ const v=vals[+k];
     if(v==null||!isFinite(v)||!SCALE){ p.setAttribute('class','dist null'+(V.d===+k?' sel':'')); p.style.fill=''; }
     else { p.setAttribute('class','dist'+(V.d===+k?' sel':'')); p.style.fill=SCALE.f(v); }
     const [t,tv]=labEls[k]; const fill = (v==null||!SCALE)? css('--null') : SCALE.f(v); const ink=inkFor(fill);
-    t.style.fill=ink; tv.style.fill=ink; const big=(M.districts[k].area_km2||0)>=7;
-    tv.textContent = big && v!=null ? rm.fmtC(v) : '';
+    t.style.fill=ink; tv.style.fill=ink; tv.textContent = (M.districts[k].area_km2||0)>=7 && v!=null ? rm.fmtC(v) : '';
   });
-  // selected district on top
   if(V.d){ const p=distEls[String(V.d).padStart(2,'0')]; if(p) p.parentNode.appendChild(p); }
   $('gSeg').style.display = S.overlay==='segments'?'':'none';
-  if(!$('zoomBtn').onclick) $('zoomBtn').onclick=()=>{ zoomOn=!zoomOn; applyZoom(); };
   renderDots(); renderLegend(rm, vals); applyZoom();
 }
-let zoomOn = true;
 function applyZoom(){
   const svg=$('map'); const vb=M.viewBox; let box=[...vb];
-  const want = V.d && zoomOn;
-  if(want){ const p=distEls[String(V.d).padStart(2,'0')]; const b=p.getBBox(); const pad=Math.max(b.width,b.height)*0.35+20;
+  if(V.d && zoomOn){ const p=distEls[String(V.d).padStart(2,'0')]; const b=p.getBBox(); const pad=Math.max(b.width,b.height)*0.35+20;
     let x=b.x-pad, y=b.y-pad, w=b.width+2*pad, h=b.height+2*pad; const ar=vb[2]/vb[3];
-    if(w/h<ar){ const nw=h*ar; x-=(nw-w)/2; w=nw; } else { const nh=w/ar; y-=(nh-h)/2; h=nh; }
-    box=[x,y,w,h]; }
+    if(w/h<ar){ const nw=h*ar; x-=(nw-w)/2; w=nw; } else { const nh=w/ar; y-=(nh-h)/2; h=nh; } box=[x,y,w,h]; }
   svg.setAttribute('viewBox', box.map(v=>v.toFixed(1)).join(' '));
-  const k = box[2]/vb[2];
-  svg.querySelectorAll('.dlab').forEach(t=>t.style.fontSize=(13*Math.max(k,0.45))+'px');
-  svg.querySelectorAll('.dval').forEach(t=>{ t.style.fontSize=(10.5*Math.max(k,0.45))+'px'; t.setAttribute('dy', (13*Math.max(k,0.45)-13).toFixed(1)); });
+  const k = Math.max(box[2]/vb[2], 0.4);
+  svg.querySelectorAll('.dlab').forEach(t=>t.style.fontSize=(13*k)+'px');
+  svg.querySelectorAll('.dval').forEach(t=>{ t.style.fontSize=(10.5*k)+'px'; t.setAttribute('dy', (13*k-13).toFixed(1)); });
   svg.querySelectorAll('.pdot').forEach(c=>c.setAttribute('r', (c.dataset.r*Math.max(k,0.35)).toFixed(2)));
   $('zoomBtn').style.display = V.d ? 'inline-block' : 'none'; $('zoomBtn').textContent = zoomOn ? '⤢ Whole island' : '⤡ Zoom to district';
 }
 function renderDots(){
-  const g=$('gDots'); g.innerHTML='';
-  if(!V.d) return;
-  const c=D.cols; const cnt=new Map(); for(const i of BY_D[V.d]){ cnt.set(c.p[i],(cnt.get(c.p[i])||0)+1); }
+  const g=$('gDots'); g.innerHTML=''; if(!V.d) return;
+  const c=D.cols; const cnt=new Map(); for(const i of BY_D[V.d]) cnt.set(c.p[i],(cnt.get(c.p[i])||0)+1);
   const mx=Math.max(1,...cnt.values());
   cnt.forEach((n,pi)=>{ const P=D.projects[pi]; if(P[4]==null||P[7]) return;
     const r0=(2.6+6*Math.sqrt(n/mx)).toFixed(1); const dot=el('circle',{cx:P[4], cy:P[5], r:r0, 'data-r':r0, class:'pdot'+(V.p===pi?' sel':'')},g);
@@ -587,19 +728,16 @@ function renderDots(){
 }
 function renderLegend(rm, vals){
   const L=$('legend');
-  if(!SCALE){ L.innerHTML='<div class="legend-note">No district has data under the current filters.</div>'; $('keyrow').innerHTML=''; return; }
+  if(!SCALE){ L.innerHTML='<div class="legend-note">No district has data for this metric under the current filters.</div>'; $('keyrow').innerHTML=''; return; }
   const fc=rm.fmtC;
-  if(SCALE.div){
-    const b=SCALE.b;
+  if(SCALE.div){ const b=SCALE.b;
     L.innerHTML=`<div class="bar-row">${SCALE.cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
-      <div class="lab-row"><span class="end l" style="left:0">${fc(SCALE.min)}</span><span style="left:16.67%">${SCALE.hasNeg?'−'+fc(b.n2).replace(/^[+−-]/,''):''}</span><span style="left:33.33%">${SCALE.hasNeg?'−'+fc(b.n1).replace(/^[+−-]/,''):''}</span><span style="left:50%">0%</span><span style="left:66.67%">${SCALE.hasPos?fc(b.p1):''}</span><span style="left:83.33%">${SCALE.hasPos?fc(b.p2):''}</span><span class="end r" style="left:100%">${fc(SCALE.max)}</span></div>
-      <div class="legend-note">${esc(rm.label)} · amber = fell, teal = rose · each side split into thirds of the districts on that side · endpoints are the periods with ≥${MIN_N_GROWTH} transactions</div>`;
-  } else {
-    const br=SCALE.br;
+      <div class="lab-row"><span class="end l" style="left:0">${fc(SCALE.min)}</span><span style="left:16.67%">${SCALE.hasNeg?fc(-b.n2):''}</span><span style="left:33.33%">${SCALE.hasNeg?fc(-b.n1):''}</span><span style="left:50%">0%</span><span style="left:66.67%">${SCALE.hasPos?fc(b.p1):''}</span><span style="left:83.33%">${SCALE.hasPos?fc(b.p2):''}</span><span class="end r" style="left:100%">${fc(SCALE.max)}</span></div>
+      <div class="legend-note">${esc(rm.label)} · amber = fell, teal = rose · each side is split into thirds of the districts on that side</div>`;
+  } else { const br=SCALE.br;
     L.innerHTML=`<div class="bar-row">${SCALE.cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
       <div class="lab-row"><span class="end l" style="left:0">${fc(br[0])}</span>${[1,2,3,4].map(i=>`<span style="left:${i*20}%">${fc(br[i])}</span>`).join('')}<span class="end r" style="left:100%">${fc(br[5])}</span></div>
-      <div class="legend-note">${esc(rm.label)}${rm.note?' ('+rm.note+')':''} · 5 classes with roughly equal numbers of districts in each</div>`;
-  }
+      <div class="legend-note">${esc(rm.label)}${rm.note?' ('+rm.note+')':''} · 5 classes, each with roughly the same number of districts</div>`; }
   const nulls=Object.values(vals).filter(v=>v==null).length;
   $('keyrow').innerHTML = `${S.overlay==='segments'?`<span class="k"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="${css('--ccr')}" stroke-width="2.6"/></svg>CCR boundary</span><span class="k"><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="${css('--rcr')}" stroke-width="2.6" stroke-dasharray="7 4"/></svg>RCR boundary (outside = OCR)</span>`:''}${nulls?`<span class="k"><svg width="14" height="12"><rect width="14" height="12" fill="url(#hatch)" stroke="${css('--border')}"/></svg>no data (${nulls})</span>`:''}${V.d?`<span class="k"><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="${css('--ink')}" fill-opacity=".62"/></svg>projects in the open district, sized by transactions</span>`:''}`;
 }
@@ -607,85 +745,93 @@ function tipPos(e, html){ const t=$('tip'); const box=$('mapbox').getBoundingCli
   let x=e.clientX-box.left+14, y=e.clientY-box.top+14; const w=t.offsetWidth, h=t.offsetHeight; if(x+w>box.width) x=e.clientX-box.left-w-14; if(y+h>box.height) y=Math.max(0,e.clientY-box.top-h-14); t.style.left=x+'px'; t.style.top=y+'px'; }
 function showTip(e,k){ const d=+k; const s=SUM_D[d]; const rm=RM[S.metric]; const v=districtMetric(S.metric,d);
   tipPos(e, `<b>D${k}</b> · ${esc(M.names[k]||'')}<br>${esc(rm.label)}: <b>${rm.fmt(v)}</b><br>${S.metric!=='psf'?`${esc(RM.psf.label)}: ${fmtPsf(pick(s,'PSF'))}<br>`:''}${S.metric!=='price'?`${esc(RM.price.label)}: ${fmtMoney(pick(s,'PRICE'))}<br>`:''}<span style="color:var(--ink-soft)">${s.n?nContext(s.n)+' in range':'no transactions under these filters'}</span>`); }
-function showTipProject(e,pi,n){ const P=D.projects[pi]; tipPos(e, `<b>${esc(P[0])}</b><br><span style="color:var(--ink-soft)">${esc(P[1])}</span><br>${fmtN(n)} tx under current filters<br><span style="color:var(--ink-soft)">click to open</span>`); }
+function showTipProject(e,pi,n){ const P=D.projects[pi]; tipPos(e, `<b>${esc(P[0])}</b>${P[11]?'<span class="harmTag">H</span>':''}<br><span style="color:var(--ink-soft)">${esc(P[1])}</span><br>${fmtN(n)} tx under current filters<br><span style="color:var(--ink-soft)">click to open</span>`); }
 function hideTip(){ $('tip').style.display='none'; }
 
-// ======================= detail panel =======================
+// ======================= navigation =======================
 function openDistrict(d){ zoomOn=true; V.level='district'; V.d=d; V.p=null; V.search=''; renderMap(); renderDetail(); renderCompare(); scrollDetail(); }
 function openProject(pi){ V.level='project'; V.p=pi; V.d=D.projects[pi][2]; renderMap(); renderDetail(); scrollDetail(); }
 function openSG(){ V.level='sg'; V.d=null; V.p=null; V.seg=null; renderMap(); renderDetail(); renderCompare(); }
 function openSeg(g){ V.level='seg'; V.seg=g; V.d=null; V.p=null; renderMap(); renderDetail(); }
+function openScope(sc){ if(sc.t==='sg') openSG(); else if(sc.t==='seg') openSeg(sc.id); else if(sc.t==='d') openDistrict(sc.id); else openProject(sc.id); }
 function scrollDetail(){ if(window.innerWidth<1060) $('detail').scrollIntoView({behavior:'smooth', block:'start'}); }
 
-function currentIdx(){
-  if(V.level==='district') return BY_D[V.d];
-  if(V.level==='seg') return BY_SEG[V.seg];
-  if(V.level==='project'){ const c=D.cols; return BY_D[V.d].filter(i=>c.p[i]===V.p); }
-  return ALL;
-}
+// ======================= detail panel =======================
 function renderDetail(){
   if(!BY_D) return;
-  const idx=currentIdx(); const sum=summarize(idx);
+  const sc=currentScope(); const idx=rowsForScope(sc); const sum=summarize(idx);
   const crumbs=[`<button onclick="openSG()">All Singapore</button>`];
   let title='All Singapore', sub='';
-  if(V.level==='seg'){ title=`${D.dict.seg[V.seg]} · ${{0:'Core Central Region',1:'Rest of Central Region',2:'Outside Central Region'}[V.seg]}`; }
+  if(V.level==='seg') title=`${D.dict.seg[V.seg]} · ${SEG_NAME[V.seg]}`;
   if(V.level==='district'||V.level==='project'){ const k=String(V.d).padStart(2,'0'); crumbs.push(`<button onclick="openDistrict(${V.d})">D${k}</button>`); title=`District ${k}`; sub=esc(M.names[k]||''); }
-  if(V.level==='project'){ const P=D.projects[V.p]; title=P[7]?`${esc(P[1])}`:esc(P[0]); sub = P[7]? 'Landed homes on this street (URA lists them without a project name)' : `${esc(P[1])} · ${D.dict.seg[P[3]]||''}`; crumbs.push(`<span>${esc(P[7]?P[1]:P[0])}</span>`); }
-  $('dTitle').innerHTML = title + `<span class="hint">${V.level==='sg'?'click a district on the map to drill in':''}</span>`;
+  if(V.level==='project'){ const P=D.projects[V.p]; title=P[7]?esc(P[1]):esc(P[0]); sub = P[7]? 'Landed homes on this street (URA lists them without a project name)' : `${esc(P[1])} · ${D.dict.seg[P[3]]||''}${P[11]?` · <span class="harmTag">${P[11]===2?'harmonised (confirmed)':'harmonised (likely, by rule)'}</span>`:''}`; crumbs.push(`<span>${esc(P[7]?P[1]:P[0])}</span>`); }
+  $('dTitle').innerHTML = title; const pinned=isPinned(sc); $('pinBtn').className='pinBtn'+(pinned?' on':''); $('pinBtn').textContent = pinned?'✓ Pinned':'＋ Pin to compare';
   $('crumbs').innerHTML = crumbs.join('<span class="sep">›</span>');
   let h = sub?`<div class="sub2">${sub}</div>`:'';
   if(!sum.n){ h += `<div class="empty">No transactions match the current filters here.<br>Widen the time range or relax a filter.</div>`; $('dBody').innerHTML=h + extrasHtml(); destroyChart(); return; }
-  h += miniStats(idx, sum);
-  h += `<div class="chartctrl"><select class="sel" id="cMetric" aria-label="Chart metric">${[['psf','$psf'],['price','Price'],['area','Area'],['lease','Remaining lease'],['volume','Transactions'],['band_psf','Spread: lowest–highest $psf'],['band_price','Spread: lowest–highest price']].map(([k,l])=>`<option value="${k}"${V.chartMetric===k?' selected':''}>${l}</option>`).join('')}</select>
-     <select class="sel" id="cBreak" aria-label="Chart breakdown">${[['none','No breakdown'],['ptype','by property type'],['sale','by type of sale'],['seg','by market segment'],['kind','by tenure']].map(([k,l])=>`<option value="${k}"${V.breakdown===k?' selected':''}>${l}</option>`).join('')}</select>
+  h += miniStats(idx, sum, sc);
+  h += `<div class="chartctrl"><select class="sel" id="cMetric" aria-label="Chart metric">${CHART_METRICS.map(([k,l])=>`<option value="${k}"${V.chartMetric===k?' selected':''}>${l}</option>`).join('')}</select>
+     <select class="sel" id="cBreak" aria-label="Chart breakdown">${BREAKDOWNS.map(([k,l])=>`<option value="${k}"${V.breakdown===k?' selected':''}>${l}</option>`).join('')}</select>
      <span class="hint" id="cHint"></span></div>
      <div class="chartbox"><canvas id="chartCanvas" role="img" aria-label="Chart over time"></canvas></div>
      <button class="btn" id="ptToggle" style="margin-top:10px">${V.showPeriodTable?'Hide':'Show'} period table</button>
      <div id="ptWrap" style="${V.showPeriodTable?'':'display:none'};margin-top:8px"></div>`;
+  h += `<div class="tabs" role="tablist">${INSIGHT_TABS.map(([k,l])=>`<button class="tab${V.tab===k?' on':''}" data-tab="${k}" role="tab">${l}</button>`).join('')}</div><div id="insight"></div>`;
   if(V.level==='sg') h += segBench();
-  if(V.level==='district') h += projectList(idx);
-  if(V.level==='project') h += projectInfo() + txTable(idx);
+  if(V.level==='district') h += projectList();
+  if(V.level==='project') h += projectInfo() + txTable();
   h += extrasHtml();
   $('dBody').innerHTML = h;
-  $('cMetric').onchange=e=>{V.chartMetric=e.target.value; drawChart(idx); drawPeriodTable(idx);};
-  $('cBreak').onchange=e=>{V.breakdown=e.target.value; drawChart(idx);};
+  $('cMetric').onchange=e=>{V.chartMetric=e.target.value; drawChart(idx, sc); drawPeriodTable(idx);};
+  $('cBreak').onchange=e=>{V.breakdown=e.target.value; drawChart(idx, sc);};
   $('ptToggle').onclick=()=>{ V.showPeriodTable=!V.showPeriodTable; $('ptWrap').style.display=V.showPeriodTable?'':'none'; $('ptToggle').textContent=(V.showPeriodTable?'Hide':'Show')+' period table'; };
-  drawChart(idx); drawPeriodTable(idx);
+  [...document.querySelectorAll('.tab')].forEach(b=>b.onclick=()=>{ V.tab=b.dataset.tab; [...document.querySelectorAll('.tab')].forEach(x=>x.classList.toggle('on',x===b)); renderInsight(idx, sc); });
+  drawChart(idx, sc); drawPeriodTable(idx); renderInsight(idx, sc);
   if(V.level==='district') wireProjectList(idx);
   if(V.level==='project') wireTxTable(idx);
 }
-function miniStats(idx, sum){
+function miniStats(idx, sum, sc){
   let peers=null, peerName='';
-  if(V.level==='district'){ peers=d=>Array.from({length:28},(_,j)=>j+1).map(dd=>({k:dd, v:districtMetric(d,dd)})); peerName='districts'; }
-  if(V.level==='project'){ const c=D.cols; const byP=new Map(); for(const i of BY_D[V.d]){ const p=c.p[i]; let a=byP.get(p); if(!a){a=[];byP.set(p,a);} a.push(i); }
-    const cache={}; peers=key=>{ if(!cache[key]) cache[key]=[...byP.entries()].map(([p,ix])=>({k:p, v:RM[key].calc(ix, key.match(/^(price|psf|area|lease)$/)?summarize(ix):null)})); return cache[key]; }; peerName='projects in district'; }
+  if(V.level==='district'){ peers=k=>Array.from({length:28},(_,j)=>j+1).map(dd=>({k:dd, v:districtMetric(k,dd)})); peerName='districts'; }
+  if(V.level==='project'){ const c=D.cols; const ps=new Set(); for(const i of BY_D[V.d]) ps.add(c.p[i]);
+    const cache={}; peers=k=>{ if(!cache[k]) cache[k]=[...ps].map(p=>({k:p, v:metricFor(k,{t:'p',id:p})})); return cache[k]; }; peerName='projects in district'; }
   const own = V.level==='district'?V.d:V.p;
-  const items = [['price'],['psf'],['area'],['lease'],['cagr_psf'],['cagr_price'],['tot_psf'],['tot_price'],['velocity']];
+  const items = ['price','psf','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','velocity','rent','yield'];
   const g=growth(idx,'PSF');
   let h='<div class="miniStats">';
-  items.forEach(([k])=>{ const rm=RM[k]; const v = rm.calc(idx, sum); const r = peers? rankAmong(peers(k), own):'';
-    const val = k==='area'? fmtAreaBoth(v) : rm.fmt(v);
-    h+=`<div class="m">${esc(rm.label)}<b>${val}</b>${r?`<span class="rankTag" title="Rank among ${peerName}, highest first">${r} ${peerName.split(' ')[0]}</span>`:''}</div>`; });
-  h+=`<div class="m">Transactions<b>${fmtN(sum.n)}</b>${sum.units!==sum.n?`<span class="rankTag">${fmtN(sum.units)} units</span>`:''}</div>`;
-  if(V.level==='sg'){ h+=`<div class="m">Avg velocity per district<b>${fmtVel(sum.n/rangeYears()/28)}</b></div>`; }
+  items.forEach(k=>{ const rm=RM[k]; const v = metricFor(k, sc); if(rm.scoped && v==null) return; const r = peers? rankAmong(peers(k), own):'';
+    h+=`<div class="m">${esc(rm.label)}<b>${k==='area'? fmtAreaBoth(v) : rm.fmt(v)}</b>${r?`<span class="rankTag" title="Rank among ${peerName}, highest first">${r} ${peerName.split(' ')[0]}</span>`:''}</div>`; });
+  h+=`<div class="m">Transactions<b>${fmtN(sum.n)}</b>${sum.units!==sum.n?`<span class="rankTag">${fmtN(sum.units)} units</span>`:''}${sum.harm?`<span class="rankTag">${Math.round(100*sum.harm/sum.n)}% harmonised</span>`:''}</div>`;
+  if(V.level==='sg') h+=`<div class="m">Avg velocity per district<b>${fmtVel(sum.n/rangeYears()/28)}</b></div>`;
   h+='</div>';
-  h+=`<div class="legend-note">${S.stat==='low'||S.stat==='high'?`${STAT_LABEL[S.stat]} = a single real transaction (${nContext(sum.n)}).`:`${STAT_LABEL[S.stat]} of ${fmtN(sum.n)} transactions in range.`} ${g.from?`Growth runs ${g.from} → ${g.to} (${g.yrs.toFixed(g.yrs%1?2:0)} yrs; first and last ${effGran()==='quarter'?'quarters':'years'} with ≥${MIN_N_GROWTH} tx), using the ${STAT_LABEL[S.stat].toLowerCase()} of each period.`:`Growth needs two ${effGran()==='quarter'?'quarters':'years'} with ≥${MIN_N_GROWTH} transactions each, at least ${MIN_YRS_GROWTH} year apart.`}</div>`;
+  const gtxt = g.from ? (S.method==='lfl'
+      ? `Growth: same-project index, ${g.from} → ${g.to} (${g.yrs.toFixed(g.yrs%1?2:0)} yrs), from ${fmtN(g.pairs)} repeat observations across ${fmtN(g.units)} project size bands. This method always uses medians. $psf is the cleaner like-for-like measure: price growth can also reflect bigger or smaller units selling within a band.`
+      : `Growth: ${STAT_LABEL[S.stat].toLowerCase()} of all transactions in ${g.from} vs ${g.to} (${g.yrs.toFixed(g.yrs%1?2:0)} yrs; first and last complete periods with ≥${MIN_N_GROWTH} tx).`)
+    : (S.method==='lfl' ? 'Growth needs the same projects to trade in periods at least a year apart.' : `Growth needs two periods with ≥${MIN_N_GROWTH} transactions, at least ${MIN_YRS_GROWTH} year apart.`);
+  h+=`<div class="legend-note">${S.stat==='low'||S.stat==='high'?`${STAT_LABEL[S.stat]} = one real transaction (${nContext(sum.n)}).`:`${STAT_LABEL[S.stat]} of ${fmtN(sum.n)} transactions in range.`} ${gtxt}</div>`;
   return h;
 }
 function segBench(){
   let h=`<div class="sectionh">Market segments <span class="hint">click to open · same filters</span></div><div class="list" style="max-height:none">`;
-  [0,1,2].forEach(g=>{ const idx=BY_SEG[g]; const s=summarize(idx);
-    h+=`<div class="row bench click" onclick="openSeg(${g})"><div class="top"><span class="nm">${D.dict.seg[g]} <small>${{0:'Core Central',1:'Rest of Central',2:'Outside Central'}[g]}</small></span><span class="v">${fmtPsf(pick(s,'PSF'))} psf · ${fmtMoney(pick(s,'PRICE'))}</span></div><div class="n">${fmtN(s.n)} tx · ${fmtVel(RM.velocity.calc(idx))}</div></div>`; });
+  [0,1,2].forEach(g=>{ const sc={t:'seg',id:g}; const idx=BY_SEG[g]; const s=summarize(idx);
+    h+=`<div class="row bench click" onclick="openSeg(${g})"><div class="top"><span class="nm">${D.dict.seg[g]} <small>${SEG_NAME[g]}</small></span><span class="v">${fmtPsf(pick(s,'PSF'))} psf · ${fmtMoney(pick(s,'PRICE'))}</span></div><div class="n">${fmtN(s.n)} tx · ${fmtVel(RM.velocity.calc(idx))} · CAGR $psf ${fmtPct(metricFor('cagr_psf',sc))} <button class="pinMini${isPinned(sc)?' on':''}" onclick="event.stopPropagation();togglePin({t:'seg',id:${g}})">${isPinned(sc)?'✓ pinned':'＋ pin'}</button></div></div>`; });
   return h+'</div>';
 }
 
 // ---------- chart ----------
+const CHART_METRICS = [['psf','$psf'],['price','Price'],['idx_psf','Index of $psf (first period = 100)'],['idx_price','Index of price (first period = 100)'],['area','Area'],['lease','Remaining lease'],['volume','Transactions'],['band_psf','Spread: lowest–highest $psf'],['band_price','Spread: lowest–highest price'],['rent','Rent ($psf / month)']];
+const BREAKDOWNS = [['none','No breakdown'],['band','by unit size (≈ bedrooms)'],['ptype','by property type'],['sale','by type of sale'],['seg','by market segment'],['kind','by tenure'],['lease','by lease left at range start'],['floor','by floor band'],['harm','by floor-area basis']];
 function destroyChart(){ if(chart){ chart.destroy(); chart=null; } }
-function seriesColours(){ return ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'].map(css); }
+const seriesColours = () => ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'].map(css);
+function leaseBandAt(i, refMi){ const c=D.cols; const k=D.dict.kind[c.k[i]]; if(k==='FH') return 0; if(k==='999') return 1; if(k!=='LH'||c.rl[i]<0) return 9;
+  const rem=c.rl[i]/10 + (c.mi[i]-refMi)/12; return rem>=95?2:rem>=90?3:rem>=85?4:rem>=80?5:rem>=70?6:rem>=60?7:8; }
 function breakdownKey(i){ const c=D.cols;
   switch(V.breakdown){ case 'ptype': return PTYPE_GROUPS[D.dict.ptype[c.t[i]]]||D.dict.ptype[c.t[i]]; case 'sale': return SALE_LABEL[c.s[i]];
-    case 'seg': return D.dict.seg[c.g[i]]; case 'kind': return KIND_LABEL[D.dict.kind[c.k[i]]]; default: return 'All'; } }
-const BREAK_ORDER = {ptype:['Apartment','Condominium','Executive condo','Strata landed','Landed'], sale:['New sale','Sub sale','Resale'], seg:['CCR','RCR','OCR'], kind:Object.values(KIND_LABEL)};
+    case 'seg': return D.dict.seg[c.g[i]]; case 'kind': return KIND_LABEL[D.dict.kind[c.k[i]]]; case 'band': return BAND[i]>=0?BAND_LABELS[BAND[i]]:'Landed';
+    case 'lease': return LB_LABELS[leaseBandAt(i, rangeStartMi())]; case 'floor': return FG_LABELS[FG[i]]; case 'harm': return HARM[i]>0?'Harmonised':'Pre-harmonisation';
+    default: return 'All'; } }
+const BREAK_ORDER = {ptype:['Apartment','Condominium','Executive condo','Strata landed','Landed'], sale:['New sale','Sub sale','Resale'], seg:['CCR','RCR','OCR'], kind:Object.values(KIND_LABEL),
+  band:[...BAND_LABELS,'Landed'], lease:LB_LABELS, floor:FG_LABELS, harm:['Pre-harmonisation','Harmonised']};
 function periodStats(rows, metric){
   const c=D.cols; const n=rows.length; if(!n) return null;
   if(metric==='volume') return {v:n, n};
@@ -693,51 +839,77 @@ function periodStats(rows, metric){
   for(const i of rows){ if(metric==='price'||metric==='band_price') vals.push(c.pr[i]); else if(metric==='psf'||metric==='band_psf') vals.push(PSF[i]); else if(metric==='area') vals.push(AREA[i]); else if(metric==='lease'){ if(c.rl[i]>=0 && D.dict.kind[c.k[i]]==='LH') vals.push(c.rl[i]/10); } }
   if(!vals.length) return null; const st=dstat(Float64Array.from(vals));
   if(metric.startsWith('band')) return {lo:st.low, hi:st.high, med:st.median, n};
-  return {v:st[S.stat], n, nv:st.n};
+  return {v:st[S.stat], n};
+}
+// index series (first covered period = 100) for a set of rows, honouring the growth method
+function indexSeries(rows, g, dim, periods){
+  if(S.method==='lfl'){ const R=rsIndex(rows,g,dim); if(!R||!R.beta) return periods.map(()=>null);
+    let a=-1; for(let t=0;t<R.periods.length;t++) if(R.cov[t]>0){ a=t; break; } if(a<0) return periods.map(()=>null);
+    let last=-1; for(let t=0;t<R.periods.length;t++) if(R.cov[t]>0) last=t;
+    return R.periods.map((p,t)=> t<a||t>last ? null : 100*Math.exp(R.beta[t]-R.beta[a])); }
+  const by=new Map(); for(const i of rows){ const p=periodOf(i,g); let a=by.get(p); if(!a){a=[];by.set(p,a);} a.push(i); }
+  const vals=periods.map(p=>{ const a=by.get(p); if(!a||a.length<MIN_N_GROWTH) return null; return dstat(Float64Array.from(a.map(i=>valOf(i,dim))))[S.stat]; });
+  const base=vals.find(v=>v!=null); return vals.map(v=> v==null||!base ? null : 100*v/base);
 }
 function chartGran(idx){ return S.gran==='auto' && effGran()==='quarter' && idx.length < 150 ? 'year' : effGran(); }
-function drawChart(idx){
-  destroyChart(); if(typeof Chart==='undefined'){ $('cHint').textContent='Chart library failed to load.'; return; }
-  const g=chartGran(idx); const metric=V.chartMetric;
-  const periods=[]; if(g==='quarter'){ for(let q=S.q0;q<=S.q1;q++) periods.push(q); } else { for(let y=D.base_year+Math.floor(S.q0/4); y<=D.base_year+Math.floor(S.q1/4); y++) periods.push(y); }
-  const pIndex=new Map(periods.map((p,j)=>[p,j]));
-  const groups=new Map();
-  for(const i of idx){ const k=breakdownKey(i); let a=groups.get(k); if(!a){ a=periods.map(()=>[]); groups.set(k,a);} const j=pIndex.get(periodOf(i,g)); if(j!=null) a[j].push(i); }
+function lineDs(label, data, colour, nPts){ return {label, data, borderColor:colour, backgroundColor:colour, borderWidth:2, pointRadius:nPts>40?0:2.5, pointHoverRadius:5, tension:0.15, spanGaps:true}; }
+function chartOptions(metric, fm, ticks, meta, stacked){
+  const ink=css('--ink-soft'), grid=css('--grid');
+  return { responsive:true, maintainAspectRatio:false, animation:false, interaction:{mode:'index', intersect:false},
+    plugins:{ legend:{display:true, labels:{color:ink, boxWidth:12, boxHeight:12, font:{size:11}}},
+      tooltip:{ callbacks:{ label:(ctx)=>{ const v=ctx.parsed.y; if(v==null) return null; const n=meta&&meta[ctx.datasetIndex]?meta[ctx.datasetIndex][ctx.dataIndex]:null;
+        const nTxt = n==null||metric==='volume' ? '' : metric.startsWith('idx')&&S.method==='lfl' ? '' : ` (${(S.stat==='low'||S.stat==='high'||ctx.dataset.label==='Lowest'||ctx.dataset.label==='Highest')&&ctx.dataset.label!=='Median'&&!metric.startsWith('idx')&&metric!=='rent' ? ((ctx.dataset.label==='Lowest'||(S.stat==='low'&&ctx.dataset.label!=='Highest'))?'lowest':'highest')+' of '+fmtN(n)+' tx' : metric==='rent' ? n+' projects' : 'n='+fmtN(n)})`;
+        return `${ctx.dataset.label}: ${fm(v)}${nTxt}`; } } } },
+    scales:{ x:{ stacked, ticks:{color:ink, maxRotation:0, autoSkip:true, font:{size:10.5}}, grid:{display:false}, border:{color:grid} },
+             y:{ stacked, beginAtZero: metric==='volume', ticks:{color:ink, callback:ticks, font:{size:10.5}}, grid:{color:grid}, border:{display:false} } } };
+}
+const FMT = {price:v=>fmtMoney(v), band_price:v=>fmtMoney(v), psf:fmtPsf, band_psf:fmtPsf, area:fmtArea, lease:fmtYrs, volume:fmtN, idx_psf:v=>v.toFixed(1), idx_price:v=>v.toFixed(1), rent:fmtRent};
+const TICKS = {price:v=>fmtMoney(v,true), band_price:v=>fmtMoney(v,true), psf:v=>'$'+Math.round(v).toLocaleString('en-SG'), band_psf:v=>'$'+Math.round(v).toLocaleString('en-SG'), area:v=>Math.round(v).toLocaleString('en-SG'), lease:v=>v+'y', volume:v=>v, idx_psf:v=>v, idx_price:v=>v, rent:v=>'$'+v.toFixed(2)};
+function drawChart(idx, sc){
+  destroyChart(); if(typeof Chart==='undefined'){ $('cHint').textContent='The chart library failed to load.'; return; }
+  const metric=V.chartMetric; const cols=seriesColours();
+  if(metric==='rent'){ return drawRentChart(sc); }
+  const g=chartGran(idx); const periods=periodsInRange(g); const pIndex=new Map(periods.map((p,j)=>[p,j]));
+  const groups=new Map(); const allRows=new Map();
+  for(const i of idx){ const k=breakdownKey(i); let a=groups.get(k); if(!a){ a=periods.map(()=>[]); groups.set(k,a); allRows.set(k,[]);} const j=pIndex.get(periodOf(i,g)); if(j!=null){ a[j].push(i); allRows.get(k).push(i); } }
   let keys=[...groups.keys()]; const ord=BREAK_ORDER[V.breakdown]; if(ord) keys.sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));
-  const cols=seriesColours(); const labels=periods.map(p=>periodLabel(p,g)+(periodPartial(p,g)?'*':''));
-  const fm = {price:v=>fmtMoney(v), band_price:v=>fmtMoney(v), psf:fmtPsf, band_psf:fmtPsf, area:fmtArea, lease:fmtYrs, volume:fmtN}[metric];
-  const ticks = {price:v=>fmtMoney(v,true), band_price:v=>fmtMoney(v,true), psf:v=>'$'+Math.round(v).toLocaleString('en-SG'), band_psf:v=>'$'+Math.round(v).toLocaleString('en-SG'), area:v=>Math.round(v).toLocaleString('en-SG'), lease:v=>v+'y', volume:v=>v}[metric];
+  const labels=periods.map(p=>periodLabel(p,g)+(periodPartial(p,g)?'*':''));
   const datasets=[]; const meta=[];
   if(metric.startsWith('band')){
-    // spread: single series (breakdown ignored) - literal min and max, median line
-    const rows=periods.map((_,j)=>{ const all=[]; groups.forEach(a=>all.push(...a[j])); return periodStats(all,metric); });
-    const c0=cols[0];
+    const rows=periods.map((_,j)=>{ const all=[]; groups.forEach(a=>all.push(...a[j])); return periodStats(all,metric); }); const c0=cols[0];
     datasets.push({label:'Highest', data:rows.map(r=>r?r.hi:null), borderColor:c0, backgroundColor:c0+'33', fill:'+1', pointRadius:0, borderWidth:1.5, spanGaps:true});
     datasets.push({label:'Lowest', data:rows.map(r=>r?r.lo:null), borderColor:c0, backgroundColor:c0+'33', fill:false, pointRadius:0, borderWidth:1.5, spanGaps:true});
     datasets.push({label:'Median', data:rows.map(r=>r?r.med:null), borderColor:css('--ink-soft'), borderDash:[4,3], pointRadius:0, borderWidth:1.5, spanGaps:true, fill:false});
-    meta.push(rows.map(r=>r?r.n:0), rows.map(r=>r?r.n:0), rows.map(r=>r?r.n:0));
-    $('cHint').textContent='Always the literal lowest and highest transaction, whatever the Statistic toggle says. Breakdown ignored.';
+    const ns=rows.map(r=>r?r.n:0); meta.push(ns,ns,ns);
+    $('cHint').textContent='Always the literal lowest and highest transaction, whatever the Statistic toggle is set to. The breakdown is ignored here.';
   } else {
-    if(keys.length>8){ keys=keys.slice(0,8); }
-    keys.forEach((k,si)=>{ const a=groups.get(k); const st=a.map(rows=>periodStats(rows,metric)); const colour=cols[si%8];
-      const ds = metric==='volume'
-        ? {label:k, data:st.map(s=>s?s.v:0), backgroundColor:colour, borderWidth:0, borderRadius:3, stack:'v', borderSkipped:'start'}
-        : {label:k, data:st.map(s=>s?s.v:null), borderColor:colour, backgroundColor:colour, borderWidth:2, pointRadius:periods.length>40?0:2.5, pointHoverRadius:5, tension:0.15, spanGaps:true};
-      datasets.push(ds); meta.push(st.map(s=>s?s.n:0)); });
-    $('cHint').textContent = (metric==='volume' ? 'Number of caveats (transactions) per period.' : `${STAT_LABEL[S.stat]} per period${V.breakdown!=='none'?', one line per group':''}. * = period only partly covered by the data or the range.`) + (g!==effGran()?' Yearly here because there are too few transactions for quarters.':'');
+    keys=keys.slice(0,8);
+    keys.forEach((k,si)=>{ const a=groups.get(k); const colour=cols[si%8];
+      if(metric.startsWith('idx')){ const vals=indexSeries(allRows.get(k), g, metric==='idx_psf'?'PSF':'PRICE', periods); datasets.push(lineDs(k, vals, colour, periods.length)); meta.push(a.map(r=>r.length)); return; }
+      const st=a.map(rows=>periodStats(rows,metric));
+      datasets.push(metric==='volume' ? {label:k, data:st.map(s=>s?s.v:0), backgroundColor:colour, borderWidth:0, borderRadius:3, stack:'v', borderSkipped:'start'} : lineDs(k, st.map(s=>s?s.v:null), colour, periods.length));
+      meta.push(st.map(s=>s?s.n:0)); });
+    $('cHint').textContent = (metric==='volume' ? 'Number of caveats (transactions) per period.'
+      : metric.startsWith('idx') ? (S.method==='lfl' ? 'Same-project repeat-sales index: each project size band compared only with itself, rebased to 100 at its first period.' : `${STAT_LABEL[S.stat]} of all transactions, rebased to 100 at the first period with ≥${MIN_N_GROWTH} tx.`)
+      : `${STAT_LABEL[S.stat]} per period${V.breakdown!=='none'?', one line per group':''}. * = period only partly covered by the data or the range.`) + (g!==effGran()?' Shown yearly: too few transactions for quarters.':'');
   }
-  const ink=css('--ink-soft'), grid=css('--grid');
-  chart = new Chart($('chartCanvas'), { type: metric==='volume'?'bar':'line', data:{labels, datasets},
-    options:{ responsive:true, maintainAspectRatio:false, animation:false, interaction:{mode:'index', intersect:false},
-      plugins:{ legend:{display: datasets.length>1, labels:{color:ink, boxWidth:12, boxHeight:12, font:{size:11}}},
-        tooltip:{ callbacks:{ label:(ctx)=>{ const n=meta[ctx.datasetIndex][ctx.dataIndex]; const v=ctx.parsed.y; if(v==null) return null;
-          const nTxt = metric==='volume'?'':` (${(metric.startsWith('band')||S.stat==='low'||S.stat==='high')&&ctx.dataset.label!=='Median'? (ctx.dataset.label==='Lowest'||S.stat==='low'?'lowest':'highest')+' of '+fmtN(n)+' tx' : 'n='+fmtN(n)})`;
-          return `${ctx.dataset.label}: ${fm(v)}${nTxt}`; } } } },
-      scales:{ x:{ stacked: metric==='volume', ticks:{color:ink, maxRotation:0, autoSkip:true, font:{size:10.5}}, grid:{display:false}, border:{color:grid} },
-               y:{ stacked: metric==='volume', beginAtZero: metric==='volume', ticks:{color:ink, callback:ticks, font:{size:10.5}}, grid:{color:grid}, border:{display:false} } } } });
+  chart = new Chart($('chartCanvas'), { type: metric==='volume'?'bar':'line', data:{labels, datasets}, options:chartOptions(metric, FMT[metric], TICKS[metric], meta, metric==='volume') });
+  if(datasets.length<=1) chart.options.plugins.legend.display=false, chart.update();
+}
+function drawRentChart(sc){
+  const cols=seriesColours(); const rows=rentRows(sc);
+  const groupBy = V.breakdown==='ptype' ? r=>PTYPE_GROUPS[D.dict.ptype[D.projects[r[0]][9]]]||'Other' : V.breakdown==='seg' ? r=>D.dict.seg[D.projects[r[0]][3]] : ()=> 'Median rent';
+  const qs=[]; for(let q=S.q0;q<=S.q1;q++) qs.push(q);
+  const groups=new Map(); rows.forEach(r=>{ const k=groupBy(r); let m=groups.get(k); if(!m){m=new Map();groups.set(k,m);} let a=m.get(r[1]); if(!a){a=[];m.set(r[1],a);} a.push(r[2]); });
+  let keys=[...groups.keys()]; const ord=BREAK_ORDER[V.breakdown]; if(ord) keys.sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));
+  const datasets=[], meta=[];
+  keys.slice(0,8).forEach((k,si)=>{ const m=groups.get(k); datasets.push(lineDs(k, qs.map(q=>m.has(q)?median(m.get(q)):null), cols[si], qs.length)); meta.push(qs.map(q=>m.has(q)?m.get(q).length:0)); });
+  $('cHint').textContent = rows.length ? 'Median of the project medians in URA\'s rental data (non-landed; URA publishes no contract counts). Breakdown works by property type or segment.' : 'No URA rental data for this selection (non-landed only, last 3 years plus the archive).';
+  chart = new Chart($('chartCanvas'), {type:'line', data:{labels:qs.map(qLabel), datasets}, options:chartOptions('rent', FMT.rent, TICKS.rent, meta, false)});
+  if(datasets.length<=1) chart.options.plugins.legend.display=false, chart.update();
 }
 function drawPeriodTable(idx){
-  const g=chartGran(idx); const metric=V.chartMetric.startsWith('band')?'psf':V.chartMetric==='volume'?'psf':V.chartMetric;
+  const g=chartGran(idx);
   const by=new Map(); for(const i of idx){ const p=periodOf(i,g); let a=by.get(p); if(!a){a=[];by.set(p,a);} a.push(i); }
   const keys=[...by.keys()].sort((a,b)=>b-a);
   let h=`<div class="tablewrap"><table class="dt"><thead><tr><th>Period</th><th>Tx</th><th>${STAT_LABEL[S.stat]} price</th><th>${STAT_LABEL[S.stat]} $psf</th><th>Lowest $psf</th><th>Highest $psf</th><th>${STAT_LABEL[S.stat]} area (sqft)</th><th>${STAT_LABEL[S.stat]} lease left</th></tr></thead><tbody>`;
@@ -745,32 +917,115 @@ function drawPeriodTable(idx){
   $('ptWrap').innerHTML = h+'</tbody></table></div>';
 }
 
+// ======================= insight tables =======================
+const INSIGHT_TABS = [['lease','Lease stage'],['floor','Floor level'],['life','Sale lifecycle'],['size','Unit size'],['rent','Rentals']];
+function groupRows(idx, keyFn){ const m=new Map(); for(const i of idx){ const k=keyFn(i); if(k==null) continue; let a=m.get(k); if(!a){a=[];m.set(k,a);} a.push(i); } return m; }
+function cagrCell(v, maxAbs){ if(v==null||!isFinite(v)) return '—'; const w=Math.min(60, Math.round(60*Math.abs(v)/(maxAbs||1)));
+  return `${fmtPct(v)}<span class="minibar" style="width:${w}px;background:${css(v<0?'--div-n2':'--div-p2')}"></span>`; }
+function renderInsight(idx, sc){
+  const el=$('insight'); if(!el) return; const tab=V.tab; let h='';
+  const yrs=rangeYears();
+  if(tab==='lease'){
+    const ref=rangeStartMi(); const m=groupRows(idx, i=>leaseBandAt(i, ref));
+    const rows=[...m.entries()].sort((a,b)=>a[0]-b[0]).map(([b,ix])=>{ const s=summarize(ix); const gp=growthLFL(ix,'PSF'), gr=growthLFL(ix,'PRICE'); const ps=new Set(ix.map(i=>D.cols.p[i]));
+      return {b, n:ix.length, proj:ps.size, psf:pick(s,'PSF'), price:pick(s,'PRICE'), cg:gp.cagr, cgp:gr.cagr, tot:gp.total, pairs:gp.pairs||0}; });
+    const mx=Math.max(...rows.map(r=>Math.abs(r.cg||0)), ...rows.map(r=>Math.abs(r.cgp||0)));
+    h+=`<div class="insight-note"><b>If you had bought at each stage of the lease, how would the same projects have moved?</b> Each project goes in the band for its remaining lease at the start of the range (${qLabel(S.q0)}). Growth is the same-project index over the range, matched within each size band, so it shows how homes at that lease stage actually appreciated. It isn't skewed by which projects happened to sell. Freehold and 999-yr are shown for comparison.</div>
+      <div class="tablewrap"><table class="dt"><thead><tr><th>Lease left at start</th><th>Tx</th><th>Projects</th><th>${STAT_LABEL[S.stat]} $psf</th><th>${STAT_LABEL[S.stat]} price</th><th>CAGR $psf</th><th>CAGR price</th><th>Total growth $psf</th><th>Repeat obs.</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td>${LB_LABELS[r.b]}</td><td>${fmtN(r.n)}</td><td>${fmtN(r.proj)}</td><td>${fmtPsf(r.psf)}</td><td>${fmtMoney(r.price)}</td><td>${cagrCell(r.cg,mx)}</td><td>${cagrCell(r.cgp,mx)}</td><td>${fmtPct(r.tot)}</td><td>${fmtN(r.pairs)}</td></tr>`).join('')}</tbody></table></div>
+      <div class="insight-note">The "Repeat obs." column counts how many same-project price changes the growth figure rests on, so treat bands with only a few dozen as indicative. Use the Remaining lease filter above to zoom into one band, or set the chart breakdown to "by lease left at range start".</div>`;
+  }
+  if(tab==='floor'){
+    const m=groupRows(idx, i=>FG[i]); const c=D.cols;
+    // premium vs 01-05 within the same project & size band
+    const base=new Map(); for(const i of idx){ if(FG[i]!==2) continue; const u=c.p[i]*16+(BAND[i]>=0?BAND[i]:8); let a=base.get(u); if(!a){a=[];base.set(u,a);} a.push(PSF[i]); }
+    const baseMed=new Map(); base.forEach((a,u)=>baseMed.set(u, median(a)));
+    const tot=idx.length;
+    const rows=[...m.entries()].sort((a,b)=>a[0]-b[0]).map(([f,ix])=>{ const s=summarize(ix); const gp=growth(ix,'PSF');
+      const cells=new Map(); for(const i of ix){ const u=c.p[i]*16+(BAND[i]>=0?BAND[i]:8); if(!baseMed.has(u)) continue; let a=cells.get(u); if(!a){a=[];cells.set(u,a);} a.push(PSF[i]); }
+      const ratios=[]; cells.forEach((a,u)=>ratios.push(median(a)/baseMed.get(u)-1)); const prem = f===2?0: ratios.length>=5? median(ratios)*100 : null;
+      return {f, n:ix.length, share:100*ix.length/tot, psf:pick(s,'PSF'), price:pick(s,'PRICE'), prem, npr:ratios.length, cg:gp.cagr, vel:ix.length/yrs}; });
+    const mx=Math.max(...rows.map(r=>Math.abs(r.cg||0)));
+    h+=`<div class="insight-note"><b>How floor level affects price, growth and how often units change hands.</b> The premium is measured within the same project and size band against floors 01–05, so it isn't confounded by taller towers being in pricier areas. Growth uses the selected method. Velocity is transactions per year; URA doesn't publish how many units sit on each floor, so velocity and share show where the trading happens, not a turnover rate.</div>
+      <div class="tablewrap"><table class="dt"><thead><tr><th>Floor</th><th>Tx</th><th>Share</th><th>Velocity</th><th>${STAT_LABEL[S.stat]} $psf</th><th>Premium vs 01–05</th><th>${STAT_LABEL[S.stat]} price</th><th>CAGR $psf</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td>${FG_LABELS[r.f]}</td><td>${fmtN(r.n)}</td><td>${r.share.toFixed(1)}%</td><td>${fmtVel(r.vel)}</td><td>${fmtPsf(r.psf)}</td><td>${r.f===2?'base':r.prem==null?'—':fmtPct(r.prem)+` <small style="color:var(--ink-soft)">(${r.npr})</small>`}</td><td>${fmtMoney(r.price)}</td><td>${cagrCell(r.cg,mx)}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  if(tab==='life'){
+    const c=D.cols; const bySale=groupRows(idx, i=>c.s[i]);
+    const rowsS=[1,2,3].filter(s=>bySale.has(s)).map(s=>{ const ix=bySale.get(s); const sm=summarize(ix); return {s, n:ix.length, psf:pick(sm,'PSF'), price:pick(sm,'PRICE'), cg:growth(ix,'PSF').cagr}; });
+    // matrix: lease age (years since lease start, leasehold) x sale type
+    const ageBand = i=>{ if(D.dict.kind[c.k[i]]!=='LH'||!c.ls[i]) return null; const a=YR[i]-c.ls[i]; return a<=2?0:a<=5?1:a<=10?2:a<=15?3:a<=20?4:a<=30?5:6; };
+    const cell=new Map(); for(const i of idx){ const a=ageBand(i); if(a==null) continue; const k=a*4+c.s[i]; let v=cell.get(k); if(!v){v=[];cell.set(k,v);} v.push(PSF[i]); }
+    // premium over the same unit's own launch price (project x size band new-sale median, whole archive)
+    const launch=new Map(); for(let i=0;i<N;i++){ if(c.s[i]!==1||c.u[i]>1) continue; const u=c.p[i]*16+(BAND[i]>=0?BAND[i]:8); let L=launch.get(u); if(!L){L={v:[],m0:1e9};launch.set(u,L);} L.v.push(PSF[i]); if(c.mi[i]<L.m0) L.m0=c.mi[i]; }
+    const prem=new Map(); for(const i of idx){ if(c.s[i]===1) continue; const u=c.p[i]*16+(BAND[i]>=0?BAND[i]:8); const L=launch.get(u); if(!L||L.v.length<3) continue;
+      if(L.med==null) L.med=median(L.v); const yrsH=(c.mi[i]-L.m0)/12; const hb=yrsH<1?0:yrsH<2?1:yrsH<3?2:yrsH<4?3:yrsH<5?4:yrsH<7?5:6; const k=hb*4+c.s[i]; let a=prem.get(k); if(!a){a={r:[],p:new Set()};prem.set(k,a);} a.r.push(PSF[i]/L.med-1); a.p.add(c.p[i]); }
+    h+=`<div class="insight-note"><b>New sale → sub sale → resale.</b> Prices by sale type, then $psf by how old the lease is (years since it began; leasehold only), and finally what sub sales and resales fetched compared with the same project and size band's own launch price, by years since launch.</div>
+      <div class="tablewrap"><table class="dt"><thead><tr><th>Type of sale</th><th>Tx</th><th>${STAT_LABEL[S.stat]} $psf</th><th>${STAT_LABEL[S.stat]} price</th><th>CAGR $psf</th></tr></thead><tbody>
+      ${rowsS.map(r=>`<tr><td>${SALE_LABEL[r.s]}</td><td>${fmtN(r.n)}</td><td>${fmtPsf(r.psf)}</td><td>${fmtMoney(r.price)}</td><td>${fmtPct(r.cg)}</td></tr>`).join('')}</tbody></table></div>
+      <div class="sectionh" style="margin-top:14px">${STAT_LABEL[S.stat]} $psf by lease age <span class="hint">years since lease start · (transactions)</span></div>
+      <div class="tablewrap"><table class="dt"><thead><tr><th>Lease age</th><th>New sale</th><th>Sub sale</th><th>Resale</th></tr></thead><tbody>
+      ${AGE_LABELS.map((l,a)=>{ const cs=[1,2,3].map(s=>{ const v=cell.get(a*4+s); return v&&v.length?`${fmtPsf(dstat(Float64Array.from(v))[S.stat])} <small style="color:var(--ink-soft)">(${fmtN(v.length)})</small>`:'—'; }); return cs.some(x=>x!=='—')?`<tr><td>${l}</td><td>${cs.join('</td><td>')}</td></tr>`:''; }).join('')}</tbody></table></div>
+      <div class="sectionh" style="margin-top:14px">Premium over own launch price <span class="hint">median · (transactions / projects)</span></div>
+      <div class="tablewrap"><table class="dt"><thead><tr><th>Years since launch</th><th>Sub sale</th><th>Resale</th></tr></thead><tbody>
+      ${HOLD_LABELS.map((l,hb)=>{ const cs=[2,3].map(s=>{ const a=prem.get(hb*4+s); return a&&a.r.length?`${fmtPct(median(a.r)*100)} <small style="color:var(--ink-soft)">(${fmtN(a.r.length)} / ${a.p.size})</small>`:'—'; }); return cs.some(x=>x!=='—')?`<tr><td>${l}</td><td>${cs.join('</td><td>')}</td></tr>`:''; }).join('') || '<tr><td colspan="3" class="l">No sub sales or resales yet of units whose launch is in the archive.</td></tr>'}</tbody></table></div>
+      <div class="insight-note">The launch-premium table only covers projects whose new sales are in the archive (from ${D.meta.earliest}), so for now it's mostly early sub sales. It fills in as the archive grows. Harmonised and pre-harmonisation areas mix in the lease-age table unless you filter by floor-area basis.</div>`;
+  }
+  if(tab==='size'){
+    const m=groupRows(idx, i=>BAND[i]>=0?BAND[i]:5); const tot=idx.length;
+    const rows=[...m.entries()].sort((a,b)=>a[0]-b[0]).map(([b,ix])=>{ const s=summarize(ix); return {b, n:ix.length, share:100*ix.length/tot, price:pick(s,'PRICE'), psf:pick(s,'PSF'), area:pick(s,'AREA'), cg:growth(ix,'PSF').cagr, cgp:growth(ix,'PRICE').cagr, vel:ix.length/yrs}; });
+    const mx=Math.max(...rows.map(r=>Math.abs(r.cg||0)), ...rows.map(r=>Math.abs(r.cgp||0)));
+    const cuts=S.cuts;
+    h+=`<div class="insight-note"><b>By unit size (≈ bedrooms).</b> Bands: studio/1-bed under ${cuts[0]} sqft, 2-bed ${cuts[0]}–${cuts[1]-1}, 3-bed ${cuts[1]}–${cuts[2]-1}, 4-bed ${cuts[2]}–${cuts[3]-1}, 5-bed+ ${cuts[3]}+. You can change these under "edit sizes" in the filters. Use the Unit size filter to restrict everything on the page, including the map, to one band.</div>
+      <div class="tablewrap"><table class="dt"><thead><tr><th>Size band</th><th>Tx</th><th>Share</th><th>Velocity</th><th>${STAT_LABEL[S.stat]} price</th><th>${STAT_LABEL[S.stat]} $psf</th><th>${STAT_LABEL[S.stat]} area</th><th>CAGR $psf</th><th>CAGR price</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td>${r.b<5?BAND_LABELS[r.b]:'Landed'}</td><td>${fmtN(r.n)}</td><td>${r.share.toFixed(1)}%</td><td>${fmtVel(r.vel)}</td><td>${fmtMoney(r.price)}</td><td>${fmtPsf(r.psf)}</td><td>${fmtN(r.area)}</td><td>${cagrCell(r.cg,mx)}</td><td>${cagrCell(r.cgp,mx)}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  if(tab==='rent'){
+    const all=rentRows(sc); const st=rentStats(sc, all);
+    if(!st){ h+=`<div class="empty">No URA rental data for this selection. URA's rental data covers non-landed projects only.</div>`; }
+    else {
+      const by = (fn)=>{ const m=new Map(); all.forEach(r=>{ const k=fn(r); if(k==null) return; let a=m.get(k); if(!a){a=[];m.set(k,a);} a.push(r); }); return m; };
+      const line=(label, rows, scope)=>{ const s=rentStats(scope, rows); if(!s) return ''; return `<tr><td>${esc(label)}</td><td>${fmtRent(s.med)}</td><td>${fmtPct(s.chg)}</td><td>${fmtN(s.n)}</td><td>${fmtYield(s.yield)}</td></tr>`; };
+      const byPt = by(r=>PTYPE_GROUPS[D.dict.ptype[D.projects[r[0]][9]]]||null);
+      const bySeg = by(r=>D.dict.seg[D.projects[r[0]][3]]);
+      h+=`<div class="insight-note"><b>Rental market.</b> URA publishes median rent per sq ft per month for each non-landed project and quarter, with no contract counts. So the figures here are medians of the project medians for the latest quarter in range (${qLabel(st.q)}), compared with four quarters earlier. Gross yield = rent × 12 ÷ median resale $psf of the matching sales over the last four quarters. Yield for property-type and segment rows uses this panel's sales.</div>
+        <div class="tablewrap"><table class="dt"><thead><tr><th>Group</th><th>Rent $psf/mo</th><th>vs 4Q earlier</th><th>Projects</th><th>Gross yield</th></tr></thead><tbody>
+        <tr class="bench">${line('This selection', all, sc).slice(4)}
+        ${[...byPt.entries()].map(([k,rows])=>line(k, rows, sc)).join('')}
+        ${sc.t==='sg' ? [...bySeg.entries()].sort().map(([k,rows])=>line(k, rows, {t:'seg', id:D.dict.seg.indexOf(k)})).join('') : ''}
+        </tbody></table></div>
+        <div class="insight-note">For rent over time, set the chart above to "Rent ($psf / month)" and break it down by property type or segment. On the map, colour districts by rent or by gross yield.</div>`;
+    }
+  }
+  el.innerHTML=h;
+}
+
 // ---------- district: project list ----------
-function projectList(idx){
-  const opts = ['psf','price','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','velocity'];
+function projectList(){
+  const opts = ['psf','price','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','velocity','rent','yield'];
   return `<div class="sectionh">Projects in this district <span style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><select class="sel" id="lMetric" aria-label="Rank projects by">${opts.map(k=>`<option value="${k}"${V.listMetric===k?' selected':''}>${esc(RM[k].label)}</option>`).join('')}</select><button class="btn" id="lSort">${V.listSort==='desc'?'High → low':'Low → high'}</button><select class="sel" id="lMin" aria-label="Minimum transactions">${[1,3,5,10,20].map(v=>`<option value="${v}"${V.minTx===v?' selected':''}>≥${v} tx</option>`).join('')}</select><input class="search" id="lSearch" placeholder="Search projects / streets" value="${esc(V.search)}"></span></div><div id="plist"></div>`;
 }
 function wireProjectList(idx){
   const draw=()=>{
-    const c=D.cols; const byP=new Map(); for(const i of idx){ const p=c.p[i]; let a=byP.get(p); if(!a){a=[];byP.set(p,a);} a.push(i); }
+    const c=D.cols; const byP=groupRows(idx, i=>c.p[i]);
     const rm=RM[V.listMetric]; const q=V.search.trim().toUpperCase();
-    let rows=[...byP.entries()].map(([p,ix])=>{ const P=D.projects[p]; const s=summarize(ix); return {p, P, n:ix.length, v:rm.calc(ix,s)}; });
+    let rows=[...byP.entries()].map(([p,ix])=>({p, P:D.projects[p], n:ix.length, v:metricFor(V.listMetric,{t:'p',id:p})}));
     if(q) rows=rows.filter(r=>r.P[0].includes(q)||r.P[1].includes(q));
     const hidden = rows.filter(r=>r.n<V.minTx).length; rows=rows.filter(r=>r.n>=V.minTx);
     rows.sort((a,b)=> (a.v==null)-(b.v==null) || (V.listSort==='desc'? b.v-a.v : a.v-b.v) || b.n-a.n);
     const vals=rows.map(r=>r.v).filter(v=>v!=null&&isFinite(v)); const lo=Math.min(...vals), hi=Math.max(...vals);
     const pct=v=> v==null?0:Math.max(2,Math.min(100,Math.round(100*(v-lo)/((hi-lo)||1))));
-    const dsum=SUM_D[V.d]; const allSum=summarize(ALL);
     let h=`<div class="list">`;
-    h+=`<div class="row bench click" onclick="openSG()"><div class="top"><span class="nm">All Singapore <small>benchmark</small></span><span class="v">${rm.fmt(rm.calc(ALL,allSum))}</span></div><div class="n">${fmtN(ALL.length)} tx</div></div>`;
-    h+=`<div class="row bench"><div class="top"><span class="nm">Whole district <small>benchmark</small></span><span class="v">${rm.fmt(rm.calc(idx,dsum))}</span></div><div class="n">${fmtN(idx.length)} tx · ${byP.size} projects/streets</div></div>`;
-    rows.slice(0,400).forEach(r=>{ const nm = r.P[7] ? `${esc(r.P[1])} <small>landed, unnamed</small>` : `${esc(r.P[0])} <small>${esc(r.P[1])}</small>`;
-      h+=`<div class="row" data-p="${r.p}"><div class="top"><span class="nm">${nm}</span><span class="v">${rm.fmt(r.v)}</span></div><div class="n">${fmtN(r.n)} tx</div><div class="bar"><i style="width:${pct(r.v)}%"></i></div></div>`; });
-    if(rows.length>400) h+=`<div class="empty">${rows.length-400} more – use the search box.</div>`;
+    h+=`<div class="row bench click" onclick="openSG()"><div class="top"><span class="nm">All Singapore <small>benchmark</small></span><span class="v">${rm.fmt(metricFor(V.listMetric,{t:'sg'}))}</span></div><div class="n">${fmtN(ALL.length)} tx</div></div>`;
+    h+=`<div class="row bench"><div class="top"><span class="nm">Whole district <small>benchmark</small></span><span class="v">${rm.fmt(metricFor(V.listMetric,{t:'d',id:V.d}))}</span></div><div class="n">${fmtN(idx.length)} tx · ${byP.size} projects/streets</div></div>`;
+    rows.slice(0,400).forEach(r=>{ const nm = r.P[7] ? `${esc(r.P[1])} <small>landed, unnamed</small>` : `${esc(r.P[0])}${r.P[11]?'<span class="harmTag">H</span>':''} <small>${esc(r.P[1])}</small>`; const sc={t:'p',id:r.p};
+      h+=`<div class="row" data-p="${r.p}"><div class="top"><span class="nm">${nm}</span><span class="v">${rm.fmt(r.v)}</span></div><div class="n">${fmtN(r.n)} tx · <button class="pinMini${isPinned(sc)?' on':''}" data-pin="${r.p}">${isPinned(sc)?'✓ pinned':'＋ pin'}</button></div><div class="bar"><i style="width:${pct(r.v)}%"></i></div></div>`; });
+    if(rows.length>400) h+=`<div class="empty">${rows.length-400} more: use the search box.</div>`;
     if(!rows.length) h+=`<div class="empty">No projects match.</div>`;
-    if(hidden) h+=`<div class="empty" style="padding:10px">${hidden} projects/streets with fewer than ${V.minTx} transactions hidden.</div>`;
+    if(hidden) h+=`<div class="empty" style="padding:10px">${hidden} projects or streets with fewer than ${V.minTx} transactions are hidden.</div>`;
     $('plist').innerHTML=h+'</div>';
     [...$('plist').querySelectorAll('.row[data-p]')].forEach(e=>e.onclick=()=>openProject(+e.dataset.p));
+    [...$('plist').querySelectorAll('[data-pin]')].forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); togglePin({t:'p',id:+b.dataset.pin}); draw(); });
   };
   $('lMetric').onchange=e=>{V.listMetric=e.target.value; draw();};
   $('lSort').onclick=()=>{V.listSort=V.listSort==='desc'?'asc':'desc'; $('lSort').textContent=V.listSort==='desc'?'High → low':'Low → high'; draw();};
@@ -785,15 +1040,14 @@ function projectInfo(){
   for(let i=0;i<N;i++){ if(c.p[i]!==V.p) continue; n++; types.set(D.dict.ptype[c.t[i]], (types.get(D.dict.ptype[c.t[i]])||0)+1); if(c.mi[i]<first) first=c.mi[i]; if(c.mi[i]>last) last=c.mi[i]; }
   const mo = m=> new Date(D.base_year+Math.floor(m/12), m%12, 1).toLocaleDateString('en-SG',{month:'short',year:'numeric'});
   const loc = {ura:'URA coordinates', 'ura-other':'URA (rental / developer data)', 'onemap-project':'OneMap lookup', 'onemap-street':'OneMap (street centre)', none:'not located'}[D.dict.loc[P[6]]];
-  return `<div class="sectionh">About</div><dl class="kv"><dt>Tenure</dt><dd>${esc(P[8]||'—')}</dd><dt>Property types</dt><dd>${[...types.entries()].map(([k,v])=>`${esc(k)} (${v})`).join(', ')}</dd><dt>District · segment</dt><dd>D${String(P[2]).padStart(2,'0')} · ${D.dict.seg[P[3]]||'—'}</dd><dt>In archive</dt><dd>${fmtN(n)} transactions, ${mo(first)} – ${mo(last)} (all, unfiltered)</dd><dt>Map location</dt><dd>${loc}</dd></dl>`;
+  const harm = P[11]===2?'Harmonised: confirmed (sourced)':P[11]===1?'Harmonised: likely, by rule (lease from 2023+, first sold Mar 2024+)':'Pre-harmonisation';
+  return `<div class="sectionh">About</div><dl class="kv"><dt>Tenure</dt><dd>${esc(P[8]||'—')}</dd><dt>Property types</dt><dd>${[...types.entries()].map(([k,v])=>`${esc(k)} (${v})`).join(', ')}</dd><dt>District · segment</dt><dd>D${String(P[2]).padStart(2,'0')} · ${D.dict.seg[P[3]]||'—'}</dd><dt>Floor-area basis</dt><dd>${harm}</dd><dt>In archive</dt><dd>${fmtN(n)} transactions, ${mo(first)} – ${mo(last)} (all, unfiltered)</dd><dt>Map location</dt><dd>${loc}</dd></dl>`;
 }
-function txTable(idx){
-  return `<div class="sectionh">Transactions <span class="hint">matching the filters · click a column to sort</span></div><div class="tablewrap" style="max-height:420px"><table class="dt" id="txT"></table></div>`;
-}
+function txTable(){ return `<div class="sectionh">Transactions <span class="hint">matching the filters · click a column to sort</span></div><div class="tablewrap" style="max-height:420px"><table class="dt" id="txT"></table></div>`; }
 function wireTxTable(idx){
   const c=D.cols;
   const colsDef=[['mi','Month',i=>new Date(D.base_year+Math.floor(c.mi[i]/12), c.mi[i]%12,1).toLocaleDateString('en-SG',{month:'short',year:'numeric'}), i=>c.mi[i]],
-    ['t','Type',i=>esc(D.dict.ptype[c.t[i]]), i=>c.t[i]], ['s','Sale',i=>SALE_LABEL[c.s[i]], i=>c.s[i]], ['f','Floor',i=>esc(D.dict.floor[c.f[i]]), i=>c.f[i]],
+    ['t','Type',i=>esc(D.dict.ptype[c.t[i]]), i=>c.t[i]], ['b','Size',i=>BAND[i]>=0?BAND_LABELS[BAND[i]].replace(' / PH','').replace('Studio / ',''):'—', i=>BAND[i]], ['s','Sale',i=>SALE_LABEL[c.s[i]], i=>c.s[i]], ['f','Floor',i=>esc(D.dict.floor[c.f[i]]), i=>c.f[i]],
     ['a','Area sqft',i=>fmtN(AREA[i]), i=>AREA[i]], ['am','sqm',i=>(c.a[i]/10).toLocaleString('en-SG'), i=>c.a[i]],
     ['pr','Price',i=>fmtMoney(c.pr[i]), i=>c.pr[i]], ['ps','$psf',i=>fmtPsf(PSF[i]), i=>PSF[i]],
     ['rl','Lease left',i=> c.rl[i]>=0 && D.dict.kind[c.k[i]]==='LH' ? (c.rl[i]/10).toFixed(1)+' yrs' : esc(KIND_LABEL[D.dict.kind[c.k[i]]].split(' ')[0]), i=>D.dict.kind[c.k[i]]==='LH'?c.rl[i]:99999],
@@ -807,56 +1061,104 @@ function wireTxTable(idx){
   draw();
 }
 
-// ---------- rentals / developer sales / pipeline ----------
+// ---------- developer sales / pipeline extras ----------
 function extrasHtml(){
   let h='';
   if(V.level==='project'){
     const X=D.extras[String(V.p)]; if(!X) return '';
-    if(X.rent){ const last=X.rent[X.rent.length-1]; const yr = rentalYield(V.p, last[0]);
-      h+=`<div class="xbox"><h4>Rental (URA median rents, non-landed)</h4><p>Latest: <b>${last[0]}</b> · median <b>$${last[1].toFixed(2)} psf/month</b> (middle half $${last[2].toFixed(2)}–$${last[3].toFixed(2)})${yr?` · implied gross yield <b>${yr.toFixed(1)}%</b> <span class="hint">(median rent × 12 ÷ median resale $psf around that quarter, unfiltered)</span>`:''}</p><p>${X.rent.slice(-8).map(r=>`${r[0]}: $${r[1].toFixed(2)}`).join(' · ')}</p></div>`; }
     if(X.dev){ const d=X.dev; const pct=d.launchedToDate?100*d.soldToDate/d.launchedToDate:null; const lm=d.m[d.m.length-1];
-      h+=`<div class="xbox"><h4>Developer sales (URA)</h4><p>${esc(d.developer)} · as of ${lm}: <b>${fmtN(d.units)}</b> units in project, <b>${fmtN(d.launchedToDate)}</b> launched, <b>${fmtN(d.soldToDate)}</b> sold${pct!=null?` (${pct.toFixed(0)}% of launched)`:''}, <b>${fmtN(d.launchedToDate-d.soldToDate)}</b> launched but unsold, <b>${fmtN(d.units-d.launchedToDate)}</b> not yet launched.</p><p>Units sold, last 6 months: ${d.m.slice(-6).map((m,j)=>{ const k=d.m.length-6+j; return `${m}: ${d.sold[k]}${d.med[k]?` @ $${d.med[k].toLocaleString('en-SG')} psf median`:''}`; }).join(' · ')}</p></div>`; }
+      h+=`<div class="xbox"><h4>Developer sales (URA)</h4><p>${esc(d.developer)} · as of ${lm}: <b>${fmtN(d.units)}</b> units in the project, <b>${fmtN(d.launchedToDate)}</b> launched, <b>${fmtN(d.soldToDate)}</b> sold${pct!=null?` (${pct.toFixed(0)}% of launched)`:''}, <b>${fmtN(d.launchedToDate-d.soldToDate)}</b> launched but unsold, <b>${fmtN(d.units-d.launchedToDate)}</b> not yet launched.</p><p>Units sold, last 6 months: ${d.m.slice(-6).map((m,j)=>{ const k=d.m.length-6+j; return k<0?'':`${m}: ${d.sold[k]}${d.med[k]?` @ $${d.med[k].toLocaleString('en-SG')} psf median`:''}`; }).filter(Boolean).join(' · ')}</p></div>`; }
+    if(X.rent){ const last=X.rent[X.rent.length-1]; h+=`<div class="xbox"><h4>Rental (URA median rents)</h4><p>Latest: <b>${last[0]}</b> · median <b>$${last[1].toFixed(2)} psf/month</b> (middle half $${last[2].toFixed(2)}–$${last[3].toFixed(2)}).</p><p>${X.rent.slice(-8).map(r=>`${r[0]}: $${r[1].toFixed(2)}`).join(' · ')}</p></div>`; }
     if(X.pipe){ h+=`<div class="xbox"><h4>In URA's pipeline</h4><p>${fmtN(X.pipe.units)} units · expected TOP ${esc(X.pipe.top==='na'?'not disclosed':X.pipe.top)} · ${esc(X.pipe.developer)}</p></div>`; }
   }
   if(V.level==='district'){ const k=String(V.d).padStart(2,'0'); const pp=D.pipeline_by_district[k];
     let unsold=0, unl=0, nd=0; for(const [pi,X] of Object.entries(D.extras)){ if(!X.dev) continue; if(D.projects[+pi][2]!==V.d) continue; if(X.dev.m[X.dev.m.length-1]!==D.meta.dev_latest_month) continue; nd++; unsold+=X.dev.launchedToDate-X.dev.soldToDate; unl+=X.dev.units-X.dev.launchedToDate; }
     if(pp||nd){ h+=`<div class="xbox"><h4>Supply in this district (URA)</h4>`;
-      if(nd) h+=`<p>Developer stock as of ${D.meta.dev_latest_month}: <b>${fmtN(unsold)}</b> launched-but-unsold units and <b>${fmtN(unl)}</b> not-yet-launched units across ${nd} projects.</p>`;
-      if(pp) h+=`<p>Pipeline (latest quarter): <b>${fmtN(pp.units)}</b> units in ${pp.projects} projects – ${pp.list.slice(0,8).map(r=>`${esc(r[0])} (${fmtN(r[2])}${r[3]&&r[3]!=='na'?', TOP '+esc(r[3]):''})`).join(', ')}${pp.list.length>8?'…':''}</p>`;
+      if(nd) h+=`<p>Developer stock as of ${D.meta.dev_latest_month}: <b>${fmtN(unsold)}</b> launched but unsold, and <b>${fmtN(unl)}</b> not yet launched, across ${nd} projects.</p>`;
+      if(pp) h+=`<p>Pipeline (latest quarter): <b>${fmtN(pp.units)}</b> units in ${pp.projects} projects: ${pp.list.slice(0,8).map(r=>`${esc(r[0])} (${fmtN(r[2])}${r[3]&&r[3]!=='na'?', TOP '+esc(r[3]):''})`).join(', ')}${pp.list.length>8?'…':''}</p>`;
       h+='</div>'; } }
   return h;
 }
-function rentalYield(pi, rq){ // rq like '2026Q2'
-  const X=D.extras[String(pi)]; const r=X.rent.find(x=>x[0]===rq); if(!r) return null;
-  const y=+rq.slice(0,4), q=+rq.slice(5)-1; const qa=(y-D.base_year)*4+q; const c=D.cols;
-  let vals=[]; for(let w=0; w<=2 && vals.length<3; w++){ vals=[]; for(let i=0;i<N;i++){ if(c.p[i]!==pi||c.s[i]!==3||c.u[i]>1) continue; if(Math.abs(QA[i]-qa)<=w) vals.push(PSF[i]); } }
-  if(vals.length<3) return null; const st=dstat(Float64Array.from(vals)); return r[1]*12/st.median*100;
+
+// ======================= pins =======================
+const MAX_PINS = 8;
+const isPinned = sc => PINS.some(p=>p.t===sc.t && (p.id??null)===(sc.id??null));
+function togglePin(sc){
+  const i=PINS.findIndex(p=>p.t===sc.t && (p.id??null)===(sc.id??null));
+  if(i>=0) PINS.splice(i,1);
+  else { if(PINS.length>=MAX_PINS){ alertPin(); return; } const used=new Set(PINS.map(p=>p.slot)); let slot=0; while(used.has(slot)) slot++; PINS.push({t:sc.t, id:sc.id??null, slot}); }
+  lsSet('pins', PINS); renderDetail(); renderPins(); renderCompare();
+}
+function alertPin(){ const c=$('pinChips'); const n=document.createElement('span'); n.className='warnline'; n.textContent=`Up to ${MAX_PINS} pins: remove one first.`; c.appendChild(n); setTimeout(()=>n.remove(),3000); }
+function destroyPinChart(){ if(pinChart){ pinChart.destroy(); pinChart=null; } }
+function renderPins(){
+  if(!BY_D) return;
+  const cols=seriesColours();
+  $('pinChips').innerHTML = PINS.length ? PINS.map((p,j)=>`<span class="chip"><i style="background:${cols[p.slot]}"></i><a href="#" data-open="${j}" style="color:inherit;text-decoration:none">${esc(scopeLabel(p))}</a><button title="Unpin" data-unpin="${j}">×</button></span>`).join('') + `<button class="btn" id="pinClear">Clear all</button>` : '';
+  if(!PINS.length){ destroyPinChart(); $('pinBody').innerHTML=`<div class="empty">Nothing pinned yet. Open the whole island, a segment, a district or a project and press "＋ Pin to compare", or use ＋ pin in the project list or the table below. Pins are kept in this browser.</div>`; return; }
+  [...$('pinChips').querySelectorAll('[data-unpin]')].forEach(b=>b.onclick=()=>{ const p=PINS[+b.dataset.unpin]; togglePin(p); });
+  [...$('pinChips').querySelectorAll('[data-open]')].forEach(a=>a.onclick=e=>{ e.preventDefault(); openScope(PINS[+a.dataset.open]); $('detail').scrollIntoView({behavior:'smooth'}); });
+  $('pinClear').onclick=()=>{ PINS=[]; lsSet('pins',PINS); renderPins(); renderDetail(); renderCompare(); };
+  const PM=[['idx_psf','Index of $psf (start = 100)'],['idx_price','Index of price (start = 100)'],['psf','$psf'],['price','Price'],['volume','Transactions'],['rent','Rent ($psf / month)']];
+  let h=`<div class="chartctrl" style="margin-top:0"><select class="sel" id="pinMetric">${PM.map(([k,l])=>`<option value="${k}"${pinMetric===k?' selected':''}>${l}</option>`).join('')}</select><span class="hint" id="pinHint"></span></div><div class="pinchart" style="margin-top:8px"><canvas id="pinCanvas" role="img" aria-label="Pinned comparison chart"></canvas></div>`;
+  // merits table
+  const MCOLS=[['n','Tx',fmtN],['velocity','Velocity',RM.velocity.fmt],['price',RM.price.label,RM.price.fmt],['psf',RM.psf.label,RM.psf.fmt],['area',RM.area.label,RM.area.fmt],['lease',RM.lease.label,RM.lease.fmt],['cagr_psf','CAGR $psf',fmtPct],['cagr_price','CAGR price',fmtPct],['tot_psf','Total growth $psf',fmtPct],['tot_price','Total growth price',fmtPct],['rent','Rent $psf/mo',fmtRent],['yield','Gross yield',fmtYield],['harm','Harmonised',v=>v==null?'—':Math.round(v)+'%']];
+  const rows=PINS.map(p=>{ const idx=rowsForScope(p); const s=summarize(idx); const o={p, n:idx.length, harm: s.n? 100*s.harm/s.n : null};
+    ['velocity','price','psf','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','rent','yield'].forEach(k=>o[k]=metricFor(k,p)); return o; });
+  const best={}; ['cagr_psf','cagr_price','tot_psf','tot_price','yield','velocity'].forEach(k=>{ const v=rows.map(r=>r[k]).filter(x=>x!=null&&isFinite(x)); if(v.length>1) best[k]=Math.max(...v); });
+  h+=`<div class="tablewrap" style="margin-top:12px; max-height:none"><table class="dt"><thead><tr><th>Pinned</th>${MCOLS.map(c=>`<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>
+    ${rows.map(r=>`<tr class="click" data-open="${PINS.indexOf(r.p)}"><td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${cols[r.p.slot]};margin-right:6px"></span>${esc(scopeLabel(r.p))}</td>${MCOLS.map(([k,,f])=>`<td class="${best[k]!=null&&r[k]===best[k]?'best':''}">${f(r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    <div class="insight-note">Highlighted = best among the pins for growth, yield and velocity. Every figure uses the current filters, time range, Statistic (${STAT_LABEL[S.stat].toLowerCase()}) and growth method (${S.method==='lfl'?'same project':'all transactions'}). Click a row to open it.</div>`;
+  $('pinBody').innerHTML=h;
+  [...$('pinBody').querySelectorAll('tr[data-open]')].forEach(tr=>tr.onclick=()=>{ openScope(PINS[+tr.dataset.open]); $('detail').scrollIntoView({behavior:'smooth'}); });
+  $('pinMetric').onchange=e=>{ pinMetric=e.target.value; drawPinChart(); };
+  drawPinChart();
+}
+function drawPinChart(){
+  destroyPinChart(); if(typeof Chart==='undefined') return;
+  const cols=seriesColours(); const metric=pinMetric; const datasets=[], meta=[]; let labels;
+  if(metric==='rent'){ const qs=[]; for(let q=S.q0;q<=S.q1;q++) qs.push(q); labels=qs.map(qLabel);
+    PINS.forEach(p=>{ const st=rentStats(p); const m=new Map((st?st.series:[]).map(s=>[s.q,s])); datasets.push(lineDs(scopeLabel(p), qs.map(q=>m.has(q)?m.get(q).v:null), cols[p.slot], qs.length)); meta.push(qs.map(q=>m.has(q)?m.get(q).n:0)); });
+    $('pinHint').textContent='Median of URA project median rents (non-landed).';
+  } else {
+    const g=effGran(); const periods=periodsInRange(g); labels=periods.map(p=>periodLabel(p,g)+(periodPartial(p,g)?'*':'')); const pIndex=new Map(periods.map((p,j)=>[p,j]));
+    PINS.forEach(p=>{ const idx=rowsForScope(p); const per=periods.map(()=>[]); for(const i of idx){ const j=pIndex.get(periodOf(i,g)); if(j!=null) per[j].push(i); }
+      if(metric.startsWith('idx')) datasets.push(lineDs(scopeLabel(p), indexSeries(idx, g, metric==='idx_psf'?'PSF':'PRICE', periods), cols[p.slot], periods.length));
+      else { const st=per.map(r=>periodStats(r,metric)); datasets.push(metric==='volume'? {label:scopeLabel(p), data:st.map(s=>s?s.v:0), backgroundColor:cols[p.slot], borderRadius:3, borderWidth:0} : lineDs(scopeLabel(p), st.map(s=>s?s.v:null), cols[p.slot], periods.length)); }
+      meta.push(per.map(r=>r.length)); });
+    $('pinHint').textContent = metric.startsWith('idx') ? (S.method==='lfl' ? 'Same-project index: each pin rebased to 100 at its first covered period, so lines compare growth, not price levels.' : `${STAT_LABEL[S.stat]} of all transactions, rebased to 100 at each pin's first period with ≥${MIN_N_GROWTH} tx.`) : `${STAT_LABEL[S.stat]} per period.`;
+  }
+  pinChart = new Chart($('pinCanvas'), {type: metric==='volume'?'bar':'line', data:{labels, datasets}, options:chartOptions(metric, FMT[metric], TICKS[metric], meta, false)});
 }
 
 // ======================= compare table =======================
 function renderCompare(){
   if(!BY_D) return;
-  const cols=[['d','District'],['name','Area'],['n','Tx'],['velocity','Velocity'],['price',RM.price.label],['psf',RM.psf.label],['area',RM.area.label+' (sqft)'],['lease',RM.lease.label],['cagr_psf','CAGR $psf'],['cagr_price','CAGR price'],['tot_psf','Growth $psf'],['tot_price','Growth price']];
-  const rowFor=(label, name, idx, sum, extra)=>({label, name, idx, sum, ...extra, n:idx.length, vals:Object.fromEntries(MAP_METRICS.map(k=>[k, RM[k].calc(idx,sum)]))});
-  const bench=[rowFor('All Singapore','',ALL,summarize(ALL),{bench:true, act:'openSG()'})];
-  [0,1,2].forEach(g=>bench.push(rowFor(D.dict.seg[g], {0:'Core Central Region',1:'Rest of Central Region',2:'Outside Central Region'}[g], BY_SEG[g], summarize(BY_SEG[g]), {bench:true, act:`openSeg(${g})`})));
-  const rows=[]; for(let d=1; d<=28; d++){ const k=String(d).padStart(2,'0'); rows.push({...rowFor('D'+k, M.names[k]||'', BY_D[d], SUM_D[d], {d, act:`openDistrict(${d})`}), vals:Object.fromEntries(MAP_METRICS.map(m=>[m, districtMetric(m,d)]))}); }
+  const keys=['velocity','price','psf','area','lease','cagr_psf','cagr_price','tot_psf','tot_price','rent','yield'];
+  const cols=[['pin',''],['d','District'],['name','Area'],['n','Tx'],['velocity','Velocity'],['price',RM.price.label],['psf',RM.psf.label],['area',RM.area.label+' (sqft)'],['lease',RM.lease.label],['cagr_psf','CAGR $psf'],['cagr_price','CAGR price'],['tot_psf','Growth $psf'],['tot_price','Growth price'],['rent','Rent $psf/mo'],['yield','Yield']];
+  const mk=(label,name,sc,extra)=>({label,name,sc,...extra, n:rowsForScope(sc).length, vals:Object.fromEntries(keys.map(k=>[k, metricFor(k,sc)]))});
+  const bench=[mk('All Singapore','',{t:'sg'},{bench:true, act:'openSG()'})]; [0,1,2].forEach(g=>bench.push(mk(D.dict.seg[g], SEG_NAME[g], {t:'seg',id:g}, {bench:true, act:`openSeg(${g})`})));
+  const rows=[]; for(let d=1; d<=28; d++){ const k=String(d).padStart(2,'0'); rows.push(mk('D'+k, M.names[k]||'', {t:'d',id:d}, {d, act:`openDistrict(${d})`})); }
   const val=(r,k)=> k==='d'?r.d : k==='name'?r.name : k==='n'?r.n : r.vals[k];
   rows.sort((a,b)=>{ const va=val(a,cmpSort.k), vb=val(b,cmpSort.k); if(va==null&&vb==null) return 0; if(va==null) return 1; if(vb==null) return -1; return (typeof va==='string'? va.localeCompare(vb) : va-vb)*cmpSort.dir; });
-  const cell=(r,k)=> k==='d'?esc(r.label) : k==='name'?esc(r.name) : k==='n'?fmtN(r.n) : k==='area'? fmtN(r.vals.area) : RM[k].fmt(r.vals[k]);
+  const cell=(r,k)=> k==='pin'? `<button class="pinMini${isPinned(r.sc)?' on':''}" data-pin='${JSON.stringify(r.sc)}' title="Pin">${isPinned(r.sc)?'✓':'＋'}</button>` : k==='d'?esc(r.label) : k==='name'?esc(r.name) : k==='n'?fmtN(r.n) : k==='area'? fmtN(r.vals.area) : RM[k].fmt(r.vals[k]);
   let h=`<thead><tr>${cols.map(([k,l])=>`<th data-k="${k}">${esc(l)}${cmpSort.k===k?(cmpSort.dir<0?' ▾':' ▴'):''}</th>`).join('')}</tr></thead><tbody>`;
-  [...bench, ...rows].forEach(r=>{ h+=`<tr class="click${r.bench?' bench':''}" onclick="${r.act}"${r.d===V.d?' style="outline:2px solid var(--accent)"':''}>${cols.map(([k],j)=>`<td${j<2?' class="l"':''}>${cell(r,k)}</td>`).join('')}</tr>`; });
+  [...bench, ...rows].forEach(r=>{ h+=`<tr class="click${r.bench?' bench':''}" onclick="${r.act}"${r.d&&r.d===V.d?' style="outline:2px solid var(--accent)"':''}>${cols.map(([k],j)=>`<td${j<3?' class="l"':''}>${cell(r,k)}</td>`).join('')}</tr>`; });
   const T=$('cmpTable'); T.innerHTML=h+'</tbody>';
-  [...T.querySelectorAll('th')].forEach(th=>th.onclick=()=>{ const k=th.dataset.k; cmpSort = cmpSort.k===k?{k,dir:-cmpSort.dir}:{k,dir:(k==='d'||k==='name')?1:-1}; renderCompare(); });
+  [...T.querySelectorAll('th')].forEach(th=>th.onclick=()=>{ const k=th.dataset.k; if(k==='pin') return; cmpSort = cmpSort.k===k?{k,dir:-cmpSort.dir}:{k,dir:(k==='d'||k==='name')?1:-1}; renderCompare(); });
+  [...T.querySelectorAll('[data-pin]')].forEach(b=>b.onclick=e=>{ e.stopPropagation(); togglePin(JSON.parse(b.dataset.pin)); });
 }
 
 // ======================= footnote =======================
 function footnote(){
-  const m=D.meta;
-  return `<p><b>Source.</b> URA Private Residential Property Transactions, Median Rentals, Developer Sales and Pipeline (URA Data Service), pulled daily by GitHub Actions. Last pull ${esc(m.pulled_at)}; page built ${esc(m.built_at.replace('T',' ').replace('+00:00',''))} UTC. URA publishes transactions on Tuesdays and Fridays, rentals quarterly, developer sales on the 15th, and the pipeline quarterly.</p>
-  <p><b>History.</b> URA serves only the latest 5 years of transactions (3 years of rentals and developer sales). Every pull is merged into a permanent archive on this repository's <code>raw-data</code> branch: the months URA still serves are replaced by the newest copy (URA revises and withdraws recent records), and older months are kept. The archive currently starts ${esc(m.earliest)}.</p>
-  <p><b>Definitions.</b> Price is the caveated price, or URA's nett price where a developer discount applies. $psf = price ÷ (area in sqm × 10.7639); area is strata floor area for apartments, condos and ECs, and land area for landed homes, so the two $psf figures are not comparable. Dates are contract months: option date for new sales, option-exercise date for resales and sub sales; recent months fill in as caveats are lodged. Remaining lease = lease start + lease length − transaction date (leasehold only; "99 years leasehold" rows without a start year borrow their project's start year). CAGR = (last ÷ first)^(1/years) − 1 between the first and last period in range with ≥${MIN_N_GROWTH} transactions; total growth is the same ratio, not annualised. Velocity = transactions ÷ years of data in range. Lowest/highest are single real transactions; median/mean are computed exactly from every matching transaction.</p>
-  <p><b>Matching.</b> Rentals, developer sales and pipeline are linked to transaction projects by name and district (${m.rent_matched??0}/${m.rent_projects??0} rental projects, ${m.dev_matched??0}/${m.dev_projects??0} developer-sales projects, ${m.pipe_matched??0}/${m.pipe_projects??0} pipeline rows). ${Math.round((m.located_tx_share||0)*100)}% of transactions belong to a project with known coordinates (URA's own, or OneMap); this only affects project dots and the drawn district shapes – every figure uses URA's own postal district.</p>`;
+  const m=D.meta, H=D.harmonisation||{};
+  return `<p><b>Source.</b> URA's data service: Private Residential Property Transactions, Median Rentals, Developer Sales and Pipeline, pulled daily by GitHub Actions. Last pull ${esc(m.pulled_at)}; page built ${esc(m.built_at.replace('T',' ').replace('+00:00',''))} UTC. URA updates transactions on Tuesdays and Fridays, developer sales on the 15th of each month, and rentals and the pipeline quarterly.</p>
+  <p><b>History.</b> URA serves only the latest 5 years of transactions (3 years of rentals and developer sales). Every pull is merged into a permanent archive on this repository's <code>raw-data</code> branch. The months URA still serves are replaced by the newest copy, since URA revises and withdraws recent records, and older months are kept. The archive currently starts in ${esc(m.earliest)}.</p>
+  <p><b>Growth methods.</b> <i>Same project</i> (default) is a repeat-sales index. Each project's size band is compared only with itself across the periods in which it traded, and one index level per period is fitted to all those changes, as in standard house-price indices. A wave of new launches therefore doesn't count as growth. It uses medians, whatever the Statistic toggle is set to. <i>All transactions</i> compares the chosen statistic of everything sold in the first and last periods with ≥${MIN_N_GROWTH} transactions. In both, CAGR = (last ÷ first)^(1/years) − 1 with the anchor periods at least a year apart, and total growth is the same ratio, not annualised. Periods only partly covered by the data (such as the current quarter) aren't used as anchors unless nothing else is available.</p>
+  <p><b>Bedrooms.</b> URA doesn't record bedroom counts. Size bands (default studio/1-bed under 580 sqft, 2-bed 580–849, 3-bed 850–1,199, 4-bed 1,200–1,599, 5-bed+ 1,600+) are set from where new-launch unit sizes cluster in the data. They apply to apartments, condos and ECs and can be edited. Older condos are larger for the same layout.</p>
+  <p><b>Floor areas.</b> URA's harmonised floor-area definitions (circular URA/PB/2022/09-DCG) apply to development applications from 1 Jun 2023 and to government land sale sites launched from 1 Sep 2022. They exclude voids, measure to the middle of walls and generally treat air-con ledges as common property, so listed areas are smaller and $psf higher for the same space. URA's transaction data carries no flag for this. ${H.n_confirmed||0} projects are marked from sources (${esc((H.confirmed||[]).join(', '))}) and ${H.n_likely||0} more by rule (${esc(H.rule||'')}). The list is in <code>data/harmonisation.json</code> and can be edited. Areas are used as reported unless you set a gross-up percentage.</p>
+  <p><b>Definitions.</b> Price is the caveated price, or URA's nett price where there was a developer discount. $psf = price ÷ area in sq ft. Area is strata floor area for apartments, condos and ECs and land area for landed homes. Dates are contract months: option date for new sales, exercise date for resales and sub sales. Remaining lease = lease start + length − sale date (leasehold only). Velocity = transactions ÷ years of data in range. Lowest and highest are single real transactions.</p>
+  <p><b>Matching.</b> Rentals, developer sales and pipeline are linked to transaction projects by name and district: ${m.rent_matched??0} of ${m.rent_projects??0} rental projects, ${m.dev_matched??0} of ${m.dev_projects??0} developer-sales projects and ${m.pipe_matched??0} of ${m.pipe_projects??0} pipeline rows. ${Math.round((m.located_tx_share||0)*100)}% of transactions belong to a project with known coordinates, which only affects the project dots and the drawn district shapes.</p>`;
 }
 </script>
 </body>

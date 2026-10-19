@@ -8,20 +8,27 @@ Sister project of [hdb-resale-dashboard](https://github.com/garethgoh99/hdb-resa
 
 ## What it shows
 
-- **Map:** the 28 postal districts, coloured by the metric you choose: price, $psf, area, remaining lease, CAGR or total growth of price or $psf, or velocity. CCR and RCR boundaries are drawn on top. Click a district to zoom in and see its projects.
-- **One Statistic toggle** (median / mean / lowest / highest) and **one time range**, from the full archive down to a single quarter, with yearly or quarterly periods. Both apply to every figure on the page.
+- **Map:** the 28 postal districts, coloured by price, $psf, area, remaining lease, CAGR or total growth (of price or $psf), velocity, median rent or gross rental yield. CCR and RCR boundaries are drawn on top. Click a district to zoom in and see its projects.
+- **Global controls:** a Statistic toggle (median / mean / lowest / highest), a **growth method** (same project like-for-like, or all transactions) and a time range from the full archive down to one quarter. All three apply to every figure on the page.
 - **Filters on every field URA publishes:**
   - property type
-  - type of sale
-  - tenure (freehold / 999-yr / leasehold) and remaining lease
+  - **unit size ≈ bedrooms** (editable size bands)
+  - type of sale and market segment
+  - tenure and remaining lease
   - floor range
+  - **floor-area basis** (pre- vs post-harmonisation, with an optional gross-up)
   - single or bulk caveats
   - price, $psf and area ranges
-  - market segment
-- **Drill-down:** All Singapore → segment → district → project. Each level has ranked mini-stats, a chart (with breakdown by property type, sale type, segment or tenure), a period table, ranked project lists and the transaction list. URA rental medians (with implied gross yield), developer sales (sold / unsold / unlaunched units) and pipeline supply are shown where they match.
-- **Compare districts:** a sortable table of all 28 districts plus the three segments, sharing the map's controls.
+- **Drill-down:** All Singapore → segment → district → project. Each level has ranked mini-stats, a chart (levels, an index rebased to 100, the min–max spread, volume or rent, broken down by size, property type, sale type, segment, tenure, lease band, floor or floor-area basis) and **insight tabs**:
+  - *Lease stage:* growth if you'd bought at each stage of the lease.
+  - *Floor level:* within-project premium, velocity and growth by floor band.
+  - *Sale lifecycle:* new → sub sale → resale, $psf by lease age, and premium over the project's own launch price.
+  - *Unit size.*
+  - *Rentals:* rent and yield by property type and segment.
+- **Pinned comparison:** pin up to 8 regions, districts or projects. You get one chart (an index for comparing growth, or price levels) and a table of merits with the best values highlighted.
+- **Compare districts:** a sortable table of all 28 districts and the three segments, sharing the page's controls.
 
-The browser gets every transaction, not pre-computed summaries, so every combination of filters gives exact medians and minimums/maximums.
+The browser gets every transaction, not pre-computed summaries, so every combination of filters gives exact figures. See `docs/dashboard-methods.md` for the methods.
 
 ## The data never shrinks: permanent archive
 

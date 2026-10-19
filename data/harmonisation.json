@@ -1,0 +1,14 @@
+{
+ "note": "Which projects report floor areas under URA's harmonised definitions (circular URA/PB/2022/09-DCG): applies to development applications submitted on/after 1 Jun 2023 and to GLS sites launched for sale on/after 1 Sep 2022. URA's transaction data carries no flag, so this file is the source of truth: 'confirmed' entries are sourced; the rule marks others as 'likely'; the force_* lists override both. Edit freely.",
+ "confirmed": [
+  {"project": "LENTOR MANSION", "source": "https://propertynet.sg/understanding-gfa-harmonization-impact-on-home-buyers-resale/ (first harmonised launch, Mar 2024)"},
+  {"project": "EMERALD OF KATONG", "source": "https://buddy.edgeprop.sg/discover/which-condo-has-harmonisation-c580d758-0546-4b00-99e5-e790b50c3063"},
+  {"project": "NORWOOD GRAND", "source": "https://buddy.edgeprop.sg/discover/which-condo-has-harmonisation-c580d758-0546-4b00-99e5-e790b50c3063"},
+  {"project": "PARKTOWN RESIDENCE", "source": "https://buddy.edgeprop.sg/discover/which-condo-has-harmonisation-c580d758-0546-4b00-99e5-e790b50c3063"},
+  {"project": "ELTA", "source": "https://propertynet.sg/new-launch-condo-floor-area-efficiency-2026-gfa-harmonisation/"}
+ ],
+ "rule": {"description": "Leasehold project whose lease commenced in 2023 or later AND whose first new sale is in March 2024 or later (Lentor Mansion, the first harmonised launch).",
+          "min_lease_start": 2023, "min_first_new_sale": "2024-03"},
+ "force_harmonised": [],
+ "force_not_harmonised": []
+}
