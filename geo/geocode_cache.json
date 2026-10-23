@@ -256,6 +256,11 @@
 "x": 24998.477447468063,
 "y": 33959.108958018114
 },
+"D' BELLA TERRACE|FLORENCE ROAD": {
+"checked": "2026-10-23",
+"district": "19",
+"x": null
+},
 "DA SILVA VILLAS|DA SILVA LANE": {
 "checked": "2026-10-19",
 "district": "19",
@@ -789,6 +794,11 @@
 "district": "16",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|BLANDFORD DRIVE": {
+"checked": "2026-10-23",
+"district": "19",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|BOON TECK ROAD": {
 "checked": "2026-10-19",
 "district": "12",
@@ -872,6 +882,11 @@
 "LANDED HOUSING DEVELOPMENT|CHAPEL CLOSE": {
 "checked": "2026-10-19",
 "district": "15",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|CHARLTON ROAD": {
+"checked": "2026-10-23",
+"district": "19",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|CHATSWORTH AVENUE": {
