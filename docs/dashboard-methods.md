@@ -61,6 +61,14 @@ The filter shows pre-harmonisation projects, harmonised projects, or both. The *
 
 URA publishes median rent per sq ft per month for each non-landed project and quarter, with no contract counts. Figures for a district, segment or property type are medians of the project medians for the latest quarter in range. Gross yield = rent × 12 ÷ median resale $psf of the same scope over the last four quarters, using non-landed resales under the current filters.
 
+## Custom selections (multi-select)
+
+Shift-click districts or projects on the map (or turn on the map's multi-select button, use "⧉ Combine", or "＋ add to selection" in lists and search) to combine any mix of districts, projects and segments. Every figure, chart and tab then uses the **union** of their transactions: a project inside a selected district is counted once, never twice. Growth for a selection is computed on the combined rows like any other scope, so the same-project index pools every project size band in the selection. Rent and yield use the URA rental rows of any project in the selection. The "In this selection" list shows each member on its own for comparison.
+
+## Map
+
+Drag to pan and scroll or pinch to zoom; the round globe button returns to All Singapore. The search box finds projects, landed streets and MRT/LRT stations. MRT/LRT stations and lines come from OpenStreetMap via cheeaun/sgraildata, projected into the district map's coordinates; they're for orientation and don't feed any figure.
+
 ## Pinned comparison
 
-You can pin up to 8 items: the whole island, a segment, a district or a project. Each keeps its colour for as long as it stays pinned, and pins are saved in the browser. The panel has a chart (index of $psf or price rebased to 100, $psf, price, transactions, or rent) and a table of merits. The best value among the pins is highlighted for growth, yield and velocity. Every figure uses the page's current filters, time range, statistic and growth method.
+You can pin up to 8 items: the whole island, a segment, a district, a project or a custom selection. Each keeps its colour for as long as it stays pinned, and pins are saved in the browser. The panel has a chart (index of $psf or price rebased to 100, $psf, price, transactions, or rent) and a table of merits. The best value among the pins is highlighted for growth, yield and velocity. Every figure uses the page's current filters, time range, statistic and growth method.

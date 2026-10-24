@@ -6,13 +6,15 @@ Four skills that together rebuild the Singapore private-residential dashboard (h
 
 1. **condo-ura-ingestion:** gets the URA token and pulls the four services (transactions, rentals, developer sales, pipeline). It merges each pull into a **permanent archive** so history outlives URA's rolling windows, geocodes projects that lack coordinates via OneMap, and harmonises the data (tenure, remaining lease, nett price, $psf, project locations).
 2. **condo-data-build:** writes every transaction in compact columnar JSON (not pre-aggregated, so every combination of filters gives exact figures). It adds per-project metadata, the **harmonised floor-area flag** (`references/harmonisation.json`) and linked rentals, developer sales and pipeline. Also covers the bedroom size bands.
-3. **condo-district-map:** derives the 28 postal-district shapes and the CCR/RCR/OCR overlay from URA's coastline and project locations, since postal districts have no official boundary file.
+3. **condo-district-map:** derives the 28 postal-district shapes and the CCR/RCR/OCR overlay from URA's coastline and project locations, since postal districts have no official boundary file, and builds the MRT/LRT overlay in the same map space.
 4. **condo-dashboard-build:** the page itself:
    - global statistic, growth method and quarter-level time controls
    - filters on every field
    - the same-project repeat-sales growth method
    - lease-stage, floor, sale-lifecycle, unit-size and rental tabs
    - pinned side-by-side comparison
+   - map search, home button, drag / scroll pan-zoom and the MRT/LRT overlay
+   - custom multi-selections (districts, projects and segments combined into one set of figures)
    - testing checklist
 
 ## Using with Claude

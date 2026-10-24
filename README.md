@@ -8,7 +8,7 @@ Sister project of [hdb-resale-dashboard](https://github.com/garethgoh99/hdb-resa
 
 ## What it shows
 
-- **Map:** the 28 postal districts, coloured by price, $psf, area, remaining lease, CAGR or total growth (of price or $psf), velocity, median rent or gross rental yield. CCR and RCR boundaries are drawn on top. Click a district to zoom in and see its projects.
+- **Map:** the 28 postal districts, coloured by price, $psf, area, remaining lease, CAGR or total growth (of price or $psf), velocity, median rent or gross rental yield. CCR and RCR boundaries and MRT/LRT lines and stations are drawn on top. Drag to pan, scroll or pinch to zoom, search for any project, street or station, and use the round globe button to get back to all of Singapore. Click a district to zoom in and see its projects.
 - **Global controls:** a Statistic toggle (median / mean / lowest / highest), a **growth method** (same project like-for-like, or all transactions) and a time range from the full archive down to one quarter. All three apply to every figure on the page.
 - **Filters on every field URA publishes:**
   - property type
@@ -25,7 +25,8 @@ Sister project of [hdb-resale-dashboard](https://github.com/garethgoh99/hdb-resa
   - *Sale lifecycle:* new → sub sale → resale, $psf by lease age, and premium over the project's own launch price.
   - *Unit size.*
   - *Rentals:* rent and yield by property type and segment.
-- **Pinned comparison:** pin up to 8 regions, districts or projects. You get one chart (an index for comparing growth, or price levels) and a table of merits with the best values highlighted.
+- **Custom selections:** Shift-click (or use the multi-select button) to combine any districts, projects and segments; every figure, chart and tab shows the combined data, counting each transaction once.
+- **Pinned comparison:** pin up to 8 regions, districts, projects or custom selections. You get one chart (an index for comparing growth, or price levels) and a table of merits with the best values highlighted.
 - **Compare districts:** a sortable table of all 28 districts and the three segments, sharing the page's controls.
 
 The browser gets every transaction, not pre-computed summaries, so every combination of filters gives exact figures. See `docs/dashboard-methods.md` for the methods.

@@ -29,8 +29,10 @@ Postal districts have no official polygon file; URA defines them as groups of po
 **Rendering:**
 - **Districts:** filled `<path>` elements with `vector-effect:non-scaling-stroke`.
 - **Segment overlay:** stroke only. CCR solid, RCR dashed, OCR not drawn (it's everything outside RCR).
-- **Zoom:** on selecting a district, zoom the viewBox to its bounding box padded by 35%, keeping the aspect ratio fixed. Scale labels and dots by the zoom factor.
+- **Zoom:** on selecting a district, zoom the viewBox to its bounding box padded by 35%, keeping the aspect ratio fixed. Users can also drag and zoom freely (see condo-dashboard-build). Scale labels and dots by the zoom factor.
 - **Labels:** colour each label by the luminance of its fill. Draw no text labels for segments, because they collide with the district numbers.
+
+**MRT/LRT overlay:** `scripts/build_mrt_overlay.py sg-rail.geojson mrt.json` projects stations and line geometry from [cheeaun/sgraildata](https://github.com/cheeaun/sgraildata) (`data/v1/sg-rail.geojson`, OpenStreetMap contributors, ODbL) into the same SVG space, using this map's `proj` (WGS84 → SVY21 via pyproj → `svgX = pad + (X − x0)·s`, `svgY = pad + (y1 − Y)·s`). Output: `{"src", "stations": [[name, codes, [lines], x, y]], "lines": [[line, name, svg path]]}`, lines being `NS EW NE CC DT TE LRT`, interchanges listing every line, paths simplified at 0.4 units. Paste it over the `const MRT = …;` line in the dashboard template. Re-run when stations open (the embedded copy includes Circle Line stage 6, opened Jul 2026) or when the district map is rebuilt (update `P` in the script to the new `proj`).
 
 `references/district_names.json` holds the conventional district names (D01 Raffles Place, Cecil, Marina, People's Park … D28 Seletar).
 

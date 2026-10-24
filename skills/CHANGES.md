@@ -2,6 +2,13 @@
 
 Newest first. The SKILL.md files describe the current design directly.
 
+- **v3 (24 Oct 2026):**
+  - Map search for projects, landed streets and MRT/LRT stations.
+  - Round "whole of Singapore" button on the map to get back to the island-wide figures.
+  - Draggable, zoomable map (drag, scroll wheel / trackpad, pinch, + / − / fit buttons).
+  - MRT/LRT overlay: lines and stations coloured by line, names shown as you zoom in (toggle under Overlay).
+  - Custom multi-selections: Shift-click, the map's multi-select button, "⧉ Combine" or "＋ add to selection" combine any districts, projects and segments; every figure, chart and tab shows the union (each transaction once), with a per-member list. Selections can be pinned and compared.
+  - The skill's template is byte-identical to the repo's `template/dashboard_template.html` (the live dashboard).
 - **v2 (20 Oct 2026):**
   - Bedroom size-band filter (editable cut-offs).
   - Harmonised floor-area flags (5 confirmed from sources + a rule for the rest) with an optional gross-up.
