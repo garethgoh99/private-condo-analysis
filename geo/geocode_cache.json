@@ -984,6 +984,11 @@
 "district": "15",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|DUKU ROAD": {
+"checked": "2026-10-27",
+"district": "15",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|DUNEARN ROAD": {
 "checked": "2026-10-19",
 "district": "21",
@@ -1999,6 +2004,11 @@
 "LANDED HOUSING DEVELOPMENT|MARYLAND DRIVE": {
 "checked": "2026-10-19",
 "district": "10",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|MATLOCK RISE": {
+"checked": "2026-10-27",
+"district": "13",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|MAYFIELD AVENUE": {
