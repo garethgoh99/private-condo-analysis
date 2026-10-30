@@ -484,5 +484,32 @@
    "new_release": false,
    "releases": 2
   }
+ },
+ {
+  "run": "2026-10-30T22:36:30.031865+00:00",
+  "transactions": {
+   "pulled": 131339,
+   "archive_before": 132414,
+   "archive_after": 132675,
+   "window_start": "2021-10",
+   "kept_older_than_window": 0,
+   "earliest": "2021-10",
+   "latest": "2026-10"
+  },
+  "rentals": {
+   "pulled": 7220,
+   "archive_before": 7818,
+   "archive_after": 7818
+  },
+  "dev_sales": {
+   "pulled": 4018,
+   "archive_before": 4002,
+   "archive_after": 4002
+  },
+  "pipeline": {
+   "pulled": 83,
+   "new_release": false,
+   "releases": 2
+  }
  }
 ]

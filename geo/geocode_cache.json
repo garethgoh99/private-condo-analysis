@@ -1496,6 +1496,11 @@
 "district": "14",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|JALAN KURNIA": {
+"checked": "2026-10-30",
+"district": "19",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|JALAN LABU MANIS": {
 "checked": "2026-10-19",
 "district": "19",
@@ -1644,6 +1649,11 @@
 "LANDED HOUSING DEVELOPMENT|JALAN SEGAM": {
 "checked": "2026-10-19",
 "district": "16",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|JALAN SELANTING": {
+"checked": "2026-10-30",
+"district": "21",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|JALAN SELENDANG DELIMA": {
@@ -2604,6 +2614,11 @@
 "query": "LANGE 28",
 "x": 32868.566067242806,
 "y": 37903.71725089736
+},
+"LAUW &amp; SONS GARDEN|BINCHANG RISE": {
+"checked": "2026-10-30",
+"district": "20",
+"x": null
 },
 "LAVENDER RESIDENCE|LAVENDER STREET": {
 "checked": "2026-10-19",
