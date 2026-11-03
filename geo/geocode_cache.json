@@ -1951,6 +1951,11 @@
 "district": "15",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|LORONG TANGGAM": {
+"checked": "2026-11-03",
+"district": "28",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|LOWLAND ROAD": {
 "checked": "2026-10-19",
 "district": "19",
@@ -2210,6 +2215,11 @@
 "district": "10",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|ROCHALIE DRIVE": {
+"checked": "2026-11-03",
+"district": "10",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|ROCHDALE ROAD": {
 "checked": "2026-10-19",
 "district": "19",
@@ -2223,6 +2233,11 @@
 "LANDED HOUSING DEVELOPMENT|SALLIM ROAD": {
 "checked": "2026-10-19",
 "district": "14",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|SANDILANDS ROAD": {
+"checked": "2026-11-03",
+"district": "19",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|SANDY LANE": {
