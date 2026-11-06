@@ -757,6 +757,11 @@
 "district": "15",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|BALMORAL PARK": {
+"checked": "2026-11-06",
+"district": "10",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|BEDOK GARDEN": {
 "checked": "2026-10-19",
 "district": "16",
@@ -1614,6 +1619,11 @@
 "LANDED HOUSING DEVELOPMENT|JALAN RAHMAT": {
 "checked": "2026-10-19",
 "district": "14",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|JALAN RAYA": {
+"checked": "2026-11-06",
+"district": "13",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|JALAN REMIS": {
@@ -2601,6 +2611,11 @@
 "LANDED HOUSING DEVELOPMENT|WOODSVILLE CLOSE": {
 "checked": "2026-10-19",
 "district": "13",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|YARROW GARDENS": {
+"checked": "2026-11-06",
+"district": "15",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|YIO CHU KANG GARDENS": {
