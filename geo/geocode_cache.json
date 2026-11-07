@@ -762,6 +762,18 @@
 "district": "10",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|BARKER ROAD": {
+"checked": "2026-11-07",
+"district": "11",
+"example": "60 BARKER ROAD ANGLO-CHINESE SCHOOL (BARKER ROAD) SINGAPORE 309919",
+"hits": 5,
+"lat": 1.319226160994797,
+"level": "street",
+"lon": 103.8348778500543,
+"query": "BARKER ROAD",
+"x": 28173.531543243116,
+"y": 33498.84356255755
+},
 "LANDED HOUSING DEVELOPMENT|BEDOK GARDEN": {
 "checked": "2026-10-19",
 "district": "16",
@@ -802,6 +814,11 @@
 "LANDED HOUSING DEVELOPMENT|BLANDFORD DRIVE": {
 "checked": "2026-10-23",
 "district": "19",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|BO SENG AVENUE": {
+"checked": "2026-11-07",
+"district": "11",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|BOON TECK ROAD": {
@@ -864,6 +881,18 @@
 "district": "08",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|CARLISLE ROAD": {
+"checked": "2026-11-07",
+"district": "08",
+"example": "10 CARLISLE ROAD SINGAPORE 219588",
+"hits": 9,
+"lat": 1.3137305056567565,
+"level": "street",
+"lon": 103.84906199778035,
+"query": "CARLISLE ROAD",
+"x": 29752.091783686643,
+"y": 32891.16768389485
+},
 "LANDED HOUSING DEVELOPMENT|CARMICHAEL ROAD": {
 "checked": "2026-10-19",
 "district": "13",
@@ -882,6 +911,16 @@
 "LANDED HOUSING DEVELOPMENT|CHANCERY HILL ROAD": {
 "checked": "2026-10-19",
 "district": "11",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|CHANCERY LANE": {
+"checked": "2026-11-07",
+"district": "11",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|CHANGI ROAD": {
+"checked": "2026-11-07",
+"district": "14",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|CHAPEL CLOSE": {
@@ -1002,6 +1041,11 @@
 "LANDED HOUSING DEVELOPMENT|DUNSFOLD DRIVE": {
 "checked": "2026-10-19",
 "district": "13",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|DYSON ROAD": {
+"checked": "2026-11-07",
+"district": "11",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|DYSON ROAD\\CHANCERY HILL ROAD": {
@@ -1125,6 +1169,16 @@
 "LANDED HOUSING DEVELOPMENT|FABER TERRACE": {
 "checked": "2026-10-19",
 "district": "05",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|FERNHILL CLOSE": {
+"checked": "2026-11-07",
+"district": "10",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|FERNHILL ROAD": {
+"checked": "2026-11-07",
+"district": "10",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|FIFTH AVENUE": {
@@ -1307,9 +1361,19 @@
 "district": "19",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|HILLCREST ROAD": {
+"checked": "2026-11-07",
+"district": "11",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|HILLSIDE TERRACE": {
 "checked": "2026-10-19",
 "district": "19",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|HOLLAND GROVE DRIVE": {
+"checked": "2026-11-07",
+"district": "10",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|HOLLAND GROVE LANE": {
@@ -1431,6 +1495,11 @@
 "district": "14",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|JALAN HAJI ALIAS": {
+"checked": "2026-11-07",
+"district": "10",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|JALAN HAJI SALAM": {
 "checked": "2026-10-19",
 "district": "16",
@@ -1526,6 +1595,11 @@
 "district": "21",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|JALAN LIM TAI SEE": {
+"checked": "2026-11-07",
+"district": "10",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|JALAN LIMAU KASTURI": {
 "checked": "2026-10-19",
 "district": "16",
@@ -1554,6 +1628,11 @@
 "LANDED HOUSING DEVELOPMENT|JALAN MELATI": {
 "checked": "2026-10-19",
 "district": "13",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|JALAN NAGA SARI": {
+"checked": "2026-11-07",
+"district": "11",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|JALAN NAUNG": {
@@ -1661,6 +1740,11 @@
 "district": "16",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|JALAN SELAMAT": {
+"checked": "2026-11-07",
+"district": "14",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|JALAN SELANTING": {
 "checked": "2026-10-30",
 "district": "21",
@@ -1676,6 +1760,11 @@
 "district": "12",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|JALAN SENANG": {
+"checked": "2026-11-07",
+"district": "14",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|JALAN SENDUDOK": {
 "checked": "2026-10-19",
 "district": "27",
@@ -1683,6 +1772,11 @@
 },
 "LANDED HOUSING DEVELOPMENT|JALAN SENTOSA": {
 "checked": "2026-10-19",
+"district": "14",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|JALAN SENYUM": {
+"checked": "2026-11-07",
 "district": "14",
 "x": null
 },
@@ -1821,6 +1915,11 @@
 "district": "11",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|KING'S ROAD": {
+"checked": "2026-11-07",
+"district": "10",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|KOVAN ROAD": {
 "checked": "2026-10-19",
 "district": "19",
@@ -1834,6 +1933,16 @@
 "LANDED HOUSING DEVELOPMENT|LEITH ROAD": {
 "checked": "2026-10-19",
 "district": "19",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|LENGKONG DUA": {
+"checked": "2026-11-07",
+"district": "14",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|LENGKONG EMPAT": {
+"checked": "2026-11-07",
+"district": "14",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|LENGKONG LIMA": {
@@ -1921,6 +2030,16 @@
 "district": "15",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|LORONG MARZUKI": {
+"checked": "2026-11-07",
+"district": "14",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|LORONG MELAYU": {
+"checked": "2026-11-07",
+"district": "14",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|LORONG ONG LYE": {
 "checked": "2026-10-19",
 "district": "19",
@@ -1934,6 +2053,11 @@
 "LANDED HOUSING DEVELOPMENT|LORONG PENCHALAK": {
 "checked": "2026-10-19",
 "district": "19",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|LORONG SALLEH": {
+"checked": "2026-11-07",
+"district": "14",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|LORONG SARHAD": {
@@ -2205,6 +2329,11 @@
 "district": "10",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|PUAY HEE AVENUE": {
+"checked": "2026-11-07",
+"district": "13",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|PUNGGOL ROAD": {
 "checked": "2026-10-19",
 "district": "19",
@@ -2307,14 +2436,29 @@
 "district": "15",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|SHREWSBURY ROAD": {
+"checked": "2026-11-07",
+"district": "11",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|SIAN TUAN AVENUE": {
 "checked": "2026-10-19",
 "district": "21",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|SIANG KUANG AVENUE": {
+"checked": "2026-11-07",
+"district": "13",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|SIGLAP GARDENS": {
 "checked": "2026-10-19",
 "district": "15",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|SIME ROAD": {
+"checked": "2026-11-07",
+"district": "11",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|SIMON PLACE": {
@@ -2329,6 +2473,11 @@
 },
 "LANDED HOUSING DEVELOPMENT|SOMMERVILLE ROAD": {
 "checked": "2026-10-19",
+"district": "13",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|SOMMERVILLE WALK": {
+"checked": "2026-11-07",
 "district": "13",
 "x": null
 },
@@ -2581,6 +2730,11 @@
 "LANDED HOUSING DEVELOPMENT|WESTWOOD AVENUE": {
 "checked": "2026-10-19",
 "district": "22",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|WHITLEY ROAD": {
+"checked": "2026-11-07",
+"district": "11",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WILKINSON ROAD": {
