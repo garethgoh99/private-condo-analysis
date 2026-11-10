@@ -2030,6 +2030,16 @@
 "district": "15",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|LORONG G TELOK KURAU": {
+"checked": "2026-11-10",
+"district": "15",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|LORONG LEW LIAN": {
+"checked": "2026-11-10",
+"district": "19",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|LORONG MARZUKI": {
 "checked": "2026-11-07",
 "district": "14",
@@ -2406,6 +2416,11 @@
 "district": "16",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|SEA BREEZE ROAD": {
+"checked": "2026-11-10",
+"district": "16",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|SEA BREEZE WALK": {
 "checked": "2026-10-19",
 "district": "16",
@@ -2667,6 +2682,11 @@
 "query": "THOMSON ROAD",
 "x": 29260.79812589474,
 "y": 33041.47596197762
+},
+"LANDED HOUSING DEVELOPMENT|THONG SOON GREEN": {
+"checked": "2026-11-10",
+"district": "26",
+"x": null
 },
 "LANDED HOUSING DEVELOPMENT|TOH TUCK ROAD": {
 "checked": "2026-10-19",
