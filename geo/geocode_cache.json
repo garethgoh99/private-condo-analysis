@@ -993,6 +993,11 @@
 "district": "10",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|CORONATION DRIVE": {
+"checked": "2026-11-13",
+"district": "10",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|COVE WAY": {
 "checked": "2026-10-19",
 "district": "04",
@@ -2399,6 +2404,11 @@
 "district": "28",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|SARACA ROAD": {
+"checked": "2026-11-13",
+"district": "28",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|SEA AVENUE": {
 "checked": "2026-10-19",
 "district": "15",
@@ -2686,6 +2696,11 @@
 "LANDED HOUSING DEVELOPMENT|THONG SOON GREEN": {
 "checked": "2026-11-10",
 "district": "26",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|TOH TUCK CRESCENT": {
+"checked": "2026-11-13",
+"district": "21",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|TOH TUCK ROAD": {
