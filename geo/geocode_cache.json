@@ -2199,6 +2199,11 @@
 "district": "19",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|MERAGI ROAD": {
+"checked": "2026-11-21",
+"district": "16",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|MERRYN ROAD": {
 "checked": "2026-11-19",
 "district": "11",
@@ -2758,23 +2763,38 @@
 "district": "11",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|TUDOR CLOSE": {
+"checked": "2026-11-21",
+"district": "11",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|UPPER CHANGI ROAD NORTH": {
+"checked": "2026-11-21",
+"district": "17",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|UPPER SERANGOON ROAD": {
+"checked": "2026-11-21",
+"district": "19",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|WAJEK WALK": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "21",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WEST COAST ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "05",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WESTLAKE AVENUE": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "20",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WESTWOOD AVENUE": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "22",
 "x": null
 },
@@ -2784,32 +2804,32 @@
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WILKINSON ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "15",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WINDSOR PARK ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "20",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WISHART ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "04",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WOLSKEL ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "13",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WOO MON CHEW ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "15",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|WOODSVILLE CLOSE": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "13",
 "x": null
 },
@@ -2819,17 +2839,17 @@
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|YIO CHU KANG GARDENS": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "20",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|YUNNAN ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "22",
 "x": null
 },
 "LANDED HOUSING DEVELOPMENT|ZEHNDER ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "05",
 "x": null
 },
@@ -2947,7 +2967,7 @@
 "y": 38035.32559802364
 },
 "LUXUS HILLS PHASE 10|LUXUS HILL HEIGHTS": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "28",
 "x": null
 },
@@ -3060,7 +3080,7 @@
 "y": 33552.53412884846
 },
 "NEWPORT RESIDENCES|ANSON ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "02",
 "x": null
 },
@@ -3185,7 +3205,7 @@
 "y": 31153.064226637904
 },
 "PEOPLES GARDEN|LORONG 7 REALTY PARK": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "19",
 "x": null
 },
@@ -3298,7 +3318,7 @@
 "y": 34654.2186688019
 },
 "RESIDENTIAL APARTMENTS|CARPMAEL ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "15",
 "x": null
 },
@@ -3315,22 +3335,22 @@
 "y": 34679.75004298799
 },
 "RESIDENTIAL APARTMENTS|HERTFORD ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "08",
 "x": null
 },
 "RESIDENTIAL APARTMENTS|JALAN LABU AYER": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "19",
 "x": null
 },
 "RESIDENTIAL APARTMENTS|JALAN RAJA UDANG": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "12",
 "x": null
 },
 "RESIDENTIAL APARTMENTS|MACKENZIE ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "09",
 "x": null
 },
@@ -3347,12 +3367,12 @@
 "y": 31474.75631932811
 },
 "RESIDENTIAL APARTMENTS|PRINCESS OF WALES ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "10",
 "x": null
 },
 "RESIDENTIAL APARTMENTS|SHREWSBURY ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "11",
 "x": null
 },
@@ -3369,7 +3389,7 @@
 "y": 37541.894124649465
 },
 "RESIDENTIAL APARTMENTS|UPPER PAYA LEBAR ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "19",
 "x": null
 },
@@ -3506,7 +3526,7 @@
 "y": 32718.04309364408
 },
 "SKYWATERS RESIDENCES|PRINCE EDWARD ROAD": {
-"checked": "2026-10-19",
+"checked": "2026-11-21",
 "district": "01",
 "x": null
 },
