@@ -184,6 +184,18 @@
 "district": "19",
 "x": null
 },
+"CHUAN SEVEN|CHUAN DRIVE": {
+"checked": "2026-11-25",
+"district": "19",
+"example": "26 CHUAN DRIVE CHUAN SEVEN SINGAPORE 554869",
+"hits": 6,
+"lat": 1.3603028218990978,
+"level": "project",
+"lon": 103.86703038416385,
+"query": "CHUAN SEVEN",
+"x": 31751.73067616361,
+"y": 38040.91665154727
+},
 "CHUAN VISTA|CHUAN DRIVE": {
 "checked": "2026-10-19",
 "district": "19",
@@ -1662,6 +1674,11 @@
 "district": "11",
 "x": null
 },
+"LANDED HOUSING DEVELOPMENT|JALAN PACHELI": {
+"checked": "2026-11-25",
+"district": "19",
+"x": null
+},
 "LANDED HOUSING DEVELOPMENT|JALAN PAKIS": {
 "checked": "2026-11-18",
 "district": "23",
@@ -2775,6 +2792,11 @@
 },
 "LANDED HOUSING DEVELOPMENT|UPPER SERANGOON ROAD": {
 "checked": "2026-11-21",
+"district": "19",
+"x": null
+},
+"LANDED HOUSING DEVELOPMENT|VALLEY ROAD": {
+"checked": "2026-11-25",
 "district": "19",
 "x": null
 },
